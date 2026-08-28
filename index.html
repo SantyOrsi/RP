@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPM Rosario — La comunidad motor de Rosario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="#" class="logo" aria-label="RPM Rosario - Inicio">
+      <svg class="logo-mark" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g>
+          <path d="M0 30 L28 27 L0 24" fill="var(--accent)"/>
+          <path d="M8 34 L32 30.5 L8 27" fill="var(--accent)" opacity="0.6"/>
+          <path d="M16 38 L36 34 L16 30" fill="var(--accent)" opacity="0.35"/>
+        </g>
+        <text x="34" y="42" class="logo-text-rpm">RPM</text>
+      </svg>
+      <span class="logo-sub">ROSARIO</span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="#garage">GARAGE</a>
+      <a href="#comunidad">COMUNIDAD</a>
+      <a href="#eventos">EVENTOS</a>
+      <a href="#asesoramiento">ASESORAMIENTO</a>
+      <a href="#magazine">MAGAZINE</a>
+      <a href="#tienda">TIENDA</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <a href="#" class="link-plain header-login">INICIAR SESIÓN</a>
+      <a href="#" class="btn btn-primary btn-sm">UNITE A RPM</a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- mobile drawer -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="#garage">GARAGE</a>
+    <a href="#comunidad">COMUNIDAD</a>
+    <a href="#eventos">EVENTOS</a>
+    <a href="#asesoramiento">ASESORAMIENTO</a>
+    <a href="#magazine">MAGAZINE</a>
+    <a href="#tienda">TIENDA</a>
+    <div class="mobile-drawer-actions">
+      <a href="#" class="link-plain">INICIAR SESIÓN</a>
+      <a href="#" class="btn btn-primary">UNITE A RPM</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=70" alt="" class="hero-img">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-lines" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <h1 class="hero-title">RPM<span class="hero-title-sub">ROSARIO</span></h1>
+    <p class="hero-headline">LA COMUNIDAD MOTOR<br>DE ROSARIO.</p>
+    <p class="hero-text">Compartí tu pasión, descubrí autos increíbles, conectá con gente y llevá tu proyecto al siguiente nivel.</p>
+    <div class="hero-ctas">
+      <a href="#garage" class="btn btn-primary">EXPLORAR GARAGE <span aria-hidden="true">→</span></a>
+      <a href="#" class="btn btn-outline">UNITE A RPM</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MUCHO MAS QUE AUTOS ===== -->
+<section class="features">
+  <h2 class="section-eyebrow"><span class="dash" aria-hidden="true"></span>MUCHO MÁS QUE AUTOS</h2>
+  <div class="features-grid">
+    <article class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h10l3 5v3a2 2 0 01-2 2M5 17h14"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>
+      </div>
+      <h3>GARAGE</h3>
+      <p>Mostrá tu auto, tus proyectos y descubrí los de la comunidad.</p>
+      <a href="#garage" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      </div>
+      <h3>COMUNIDAD</h3>
+      <p>Foros, debates, dudas y experiencias entre amantes del motor.</p>
+      <a href="#comunidad" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 11-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>
+      </div>
+      <h3>ASESORAMIENTO</h3>
+      <p>Consultá a expertos y recibí asesoramiento personalizado para tu auto.</p>
+      <a href="#asesoramiento" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      </div>
+      <h3>EVENTOS</h3>
+      <p>Enterate de los próximos encuentros, expos y actividades en Rosario.</p>
+      <a href="#eventos" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
+    </article>
+  </div>
+</section>
+
+<!-- ===== GARAGE / FIERROS ===== -->
+<section class="garage" id="garage">
+  <div class="garage-head">
+    <div>
+      <p class="section-eyebrow section-eyebrow--tight">GARAGE</p>
+      <h2 class="section-title">LOS FIERROS DE<br>LA COMUNIDAD.</h2>
+      <a href="#" class="btn btn-outline btn-sm">VER TODO EL GARAGE <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="carPrev" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="carousel-btn" id="carNext" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="car-carousel" id="carCarousel">
+    <article class="car-card">
+      <div class="car-img"><img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=70" alt="BMW E36" loading="lazy"></div>
+      <div class="car-info">
+        <h3>BMW E36</h3>
+        <span class="car-user">@nicoe36</span>
+        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
+      </div>
+    </article>
+    <article class="car-card">
+      <div class="car-img"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=70" alt="Honda Civic Si" loading="lazy"></div>
+      <div class="car-info">
+        <h3>HONDA CIVIC SI</h3>
+        <span class="car-user">@civic.si</span>
+        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
+      </div>
+    </article>
+    <article class="car-card">
+      <div class="car-img"><img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=70" alt="VW Golf GTI" loading="lazy"></div>
+      <div class="car-info">
+        <h3>VW GOLF GTI</h3>
+        <span class="car-user">@gti.mk7</span>
+        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
+      </div>
+    </article>
+    <article class="car-card">
+      <div class="car-img"><img src="https://images.unsplash.com/photo-1494905998402-395d579af36f?auto=format&fit=crop&w=800&q=70" alt="Ford Mustang" loading="lazy"></div>
+      <div class="car-info">
+        <h3>FORD MUSTANG GT</h3>
+        <span class="car-user">@mustang.rsr</span>
+        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ===== COMUNIDAD + EVENTO ===== -->
+<section class="community" id="comunidad">
+  <div class="community-left">
+    <p class="section-eyebrow section-eyebrow--tight">COMUNIDAD</p>
+    <h2 class="section-title">LO QUE SE HABLA<br>EN LA COMUNIDAD.</h2>
+    <a href="#" class="btn btn-outline btn-sm">IR AL FORO <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="forum-card">
+    <a href="#" class="forum-row">
+      <span class="forum-flag forum-flag--hot" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2c1 3-2 4-2 7a3 3 0 006 0c1 1 2 2.5 2 4.5A6.5 6.5 0 0111.5 20 6.5 6.5 0 015 13.5C5 9 8 6 12 2z"/></svg>
+      </span>
+      <span class="forum-text">
+        <strong>¿Qué auto comprarías con $15M?</strong>
+        <em>Por JuanCR · Hace 2 hs</em>
+      </span>
+      <span class="forum-replies"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 42 respuestas</span>
+    </a>
+    <a href="#" class="forum-row">
+      <span class="forum-flag" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 11-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>
+      </span>
+      <span class="forum-text">
+        <strong>¿Algún mecánico bueno en zona norte?</strong>
+        <em>Por AgusRS · Hace 5 hs</em>
+      </span>
+      <span class="forum-replies"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 18 respuestas</span>
+    </a>
+    <a href="#" class="forum-row">
+      <span class="forum-flag" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21V4m0 0h12l-1.5 4L16 12H4"/></svg>
+      </span>
+      <span class="forum-text">
+        <strong>¿Quién va al próximo encuentro?</strong>
+        <em>Por LeanF · Hace 1 día</em>
+      </span>
+      <span class="forum-replies"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 31 respuestas</span>
+    </a>
+  </div>
+
+  <div class="event-card" id="eventos">
+    <div class="event-img">
+      <img src="https://images.unsplash.com/photo-1541348263662-e068662d82af?auto=format&fit=crop&w=900&q=70" alt="RPM Meet" loading="lazy">
+      <span class="event-tag">PRÓXIMO EVENTO</span>
+    </div>
+    <div class="event-body">
+      <h3>RPM MEET #01</h3>
+      <ul class="event-meta">
+        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> Sábado 14 de Septiembre</li>
+        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> 15:00 hs</li>
+        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario, Santa Fe</li>
+      </ul>
+      <a href="#" class="btn btn-primary btn-sm">VER EVENTO <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAGAZINE ===== -->
+<section class="magazine" id="magazine">
+  <p class="section-eyebrow section-eyebrow--tight">RPM MAGAZINE</p>
+  <h2 class="section-title">NOTAS, GUÍAS Y MÁS.</h2>
+
+  <div class="magazine-grid">
+    <article class="mag-card">
+      <div class="mag-img">
+        <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=800&q=70" alt="" loading="lazy">
+        <span class="mag-badge">GUÍA</span>
+      </div>
+      <h3>5 cosas que revisar antes de comprar un usado</h3>
+      <span class="mag-date">Hace 2 días</span>
+    </article>
+    <article class="mag-card">
+      <div class="mag-img">
+        <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=70" alt="" loading="lazy">
+        <span class="mag-badge">TIPS</span>
+      </div>
+      <h3>Los mejores lugares para hacer detailing en Rosario</h3>
+      <span class="mag-date">Hace 4 días</span>
+    </article>
+    <article class="mag-card">
+      <div class="mag-img">
+        <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=70" alt="" loading="lazy">
+        <span class="mag-badge">REVIEW</span>
+      </div>
+      <h3>Probamos el nuevo Golf R: ¿vale la pena?</h3>
+      <span class="mag-date">Hace 1 semana</span>
+    </article>
+  </div>
+</section>
+
+<!-- ===== NEWSLETTER ===== -->
+<section class="newsletter">
+  <div class="newsletter-inner">
+    <div>
+      <h2>TU AUTO. TU COMUNIDAD. TU RPM.</h2>
+      <p>Sumate a la comunidad y llevá tu pasión por los motores al siguiente nivel.</p>
+    </div>
+    <form class="newsletter-form" id="newsletterForm">
+      <input type="email" placeholder="Tu email" required aria-label="Tu email">
+      <button type="submit" class="btn btn-primary">UNITE A RPM</button>
+    </form>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" id="asesoramiento">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="logo">
+        <svg class="logo-mark" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g>
+            <path d="M0 30 L28 27 L0 24" fill="var(--accent)"/>
+            <path d="M8 34 L32 30.5 L8 27" fill="var(--accent)" opacity="0.6"/>
+            <path d="M16 38 L36 34 L16 30" fill="var(--accent)" opacity="0.35"/>
+          </g>
+          <text x="34" y="42" class="logo-text-rpm">RPM</text>
+        </svg>
+        <span class="logo-sub">ROSARIO</span>
+      </a>
+      <p>RPM Rosario es la comunidad motor de Rosario. Garage, foros, asesoramiento, eventos y mucho más.</p>
+      <div class="social-links">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 3c.3 2 1.8 3.6 4 3.9v2.6c-1.4 0-2.7-.4-3.9-1.2v6.1a5.6 5.6 0 11-5.6-5.6c.3 0 .6 0 .9.1v2.7a2.9 2.9 0 102.4 2.8V3H14z"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M10.5 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>NAVEGACIÓN</h4>
+      <a href="#garage">Garage</a>
+      <a href="#comunidad">Comunidad</a>
+      <a href="#eventos">Eventos</a>
+      <a href="#asesoramiento">Asesoramiento</a>
+      <a href="#magazine">Magazine</a>
+      <a href="#tienda">Tienda</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>LEGAL</h4>
+      <a href="#">Términos y condiciones</a>
+      <a href="#">Política de privacidad</a>
+      <a href="#">Normas de la comunidad</a>
+      <a href="#">Contacto</a>
+    </div>
+
+    <div class="footer-col" id="tienda">
+      <h4>CONTACTO</h4>
+      <a href="mailto:hola@rpmrosario.com"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>hola@rpmrosario.com</a>
+      <a href="#"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Rosario, Santa Fe, Argentina</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 RPM Rosario. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
