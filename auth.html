@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/auth.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body class="auth-body">
 
@@ -49,6 +50,8 @@
 
         <p class="auth-message" id="loginMessage" hidden></p>
 
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAEgO0vN3QbVTSUnS" data-theme="dark"></div>
+
         <button type="submit" class="btn btn-primary auth-submit">INICIAR SESIÓN</button>
       </form>
     </section>
@@ -77,6 +80,21 @@
           <input type="text" name="razon_social" autocomplete="organization" placeholder="Ej: Automotores del Litoral S.A.">
         </label>
 
+        <div id="fieldDatosPersonales" hidden>
+          <label class="auth-field">
+            <span>Nombre</span>
+            <input type="text" name="nombre" autocomplete="given-name" placeholder="Tu nombre">
+          </label>
+          <label class="auth-field">
+            <span>Apellido</span>
+            <input type="text" name="apellido" autocomplete="family-name" placeholder="Tu apellido">
+          </label>
+          <label class="auth-field">
+            <span>DNI</span>
+            <input type="text" name="dni" inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456">
+          </label>
+        </div>
+
         <label class="auth-field">
           <span>Email</span>
           <input type="email" name="email" required autocomplete="email" placeholder="tu@email.com">
@@ -91,6 +109,8 @@
         </label>
 
         <p class="auth-message" id="registerMessage" hidden></p>
+
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAEgO0vN3QbVTSUnS" data-theme="dark"></div>
 
         <button type="submit" class="btn btn-primary auth-submit">CREAR CUENTA</button>
         <p class="auth-fineprint">Al crear tu cuenta te vamos a enviar un mail para confirmarla.</p>

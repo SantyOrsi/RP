@@ -26,6 +26,10 @@ const accountTypeBtns = document.querySelectorAll('.account-type-btn');
 const accountTypeInput = document.querySelector('#registerForm input[name="account_type"]');
 const fieldRazonSocial = document.getElementById('fieldRazonSocial');
 const razonSocialInput = fieldRazonSocial.querySelector('input[name="razon_social"]');
+const fieldDatosPersonales = document.getElementById('fieldDatosPersonales');
+const nombreInput = fieldDatosPersonales.querySelector('input[name="nombre"]');
+const apellidoInput = fieldDatosPersonales.querySelector('input[name="apellido"]');
+const dniInput = fieldDatosPersonales.querySelector('input[name="dni"]');
 
 accountTypeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -40,6 +44,16 @@ accountTypeBtns.forEach(btn => {
     fieldRazonSocial.hidden = !esConcesionaria;
     razonSocialInput.required = esConcesionaria;
     if (!esConcesionaria) razonSocialInput.value = '';
+
+    fieldDatosPersonales.hidden = esConcesionaria;
+    nombreInput.required = !esConcesionaria;
+    apellidoInput.required = !esConcesionaria;
+    dniInput.required = !esConcesionaria;
+    if (esConcesionaria) {
+      nombreInput.value = '';
+      apellidoInput.value = '';
+      dniInput.value = '';
+    }
   });
 });
 
@@ -100,6 +114,9 @@ registerForm.addEventListener('submit', async (e) => {
   const passwordConfirm = formData.get('password_confirm');
   const accountType = formData.get('account_type');
   const razonSocial = (formData.get('razon_social') || '').trim();
+  const nombre = (formData.get('nombre') || '').trim();
+  const apellido = (formData.get('apellido') || '').trim();
+  const dni = (formData.get('dni') || '').trim();
 
   if (password !== passwordConfirm) {
     mostrarMensaje(registerMessage, 'Las contraseñas no coinciden.');
@@ -112,6 +129,16 @@ registerForm.addEventListener('submit', async (e) => {
   if (accountType === 'concesionaria' && razonSocial.length < 3) {
     mostrarMensaje(registerMessage, 'Ingresá la razón social de la concesionaria (mínimo 3 caracteres).');
     return;
+  }
+  if (accountType === 'particular') {
+    if (nombre.length < 2 || apellido.length < 2) {
+      mostrarMensaje(registerMessage, 'Ingresá tu nombre y apellido.');
+      return;
+    }
+    if (!/^\d{7,8}$/.test(dni)) {
+      mostrarMensaje(registerMessage, 'Ingresá un DNI válido (7 u 8 dígitos).');
+      return;
+    }
   }
 
   const btn = registerForm.querySelector('.auth-submit');
@@ -126,6 +153,9 @@ registerForm.addEventListener('submit', async (e) => {
       data: {
         account_type: accountType,
         razon_social: accountType === 'concesionaria' ? razonSocial : null,
+        nombre: accountType === 'particular' ? nombre : null,
+        apellido: accountType === 'particular' ? apellido : null,
+        dni: accountType === 'particular' ? dni : null,
       },
       emailRedirectTo: window.location.origin + '/index.html',
     },

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/auth.css">
 <link rel="stylesheet" href="css/admin.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body class="auth-body">
 
@@ -43,6 +44,7 @@
           <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
         </label>
         <p class="auth-message" id="adminLoginMessage" hidden></p>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAEgO0vN3QbVTSUnS" data-theme="dark"></div>
         <button type="submit" class="btn btn-primary auth-submit">INICIAR SESIÓN</button>
       </form>
     </section>
