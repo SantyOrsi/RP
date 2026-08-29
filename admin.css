@@ -1,0 +1,69 @@
+/* admin.css — panel de eventos (usa las variables de styles.css y auth.css) */
+
+.admin-wrap{
+  width:100%; max-width: 980px; margin: 0 auto;
+}
+
+.admin-head{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+  margin-bottom: 26px; flex-wrap:wrap;
+}
+.admin-head h1{
+  font-size: 24px; font-weight:700; letter-spacing:.03em; margin-bottom:6px;
+}
+.admin-head p{ color: var(--text-dim); font-size:13.5px; }
+
+.admin-grid{
+  display:grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items:start;
+}
+
+.admin-card{
+  background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius);
+  padding: 22px 24px 26px;
+}
+.admin-card h2{
+  font-family: var(--font-display); font-size:15px; font-weight:700; letter-spacing:.08em;
+  color: var(--accent); margin-bottom:18px;
+}
+
+.admin-form-row{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+.auth-field textarea{
+  background: var(--bg); border:1px solid var(--border); border-radius:6px;
+  padding: 13px 14px; color: var(--text); font-size:14.5px; font-family: var(--font-body);
+  resize: vertical;
+}
+.auth-field textarea:focus{ outline:none; border-color: var(--accent); }
+
+.admin-form-actions{ display:flex; gap:10px; margin-top:4px; }
+.admin-form-actions .auth-submit{ margin-top:0; }
+
+/* ----- Lista de eventos ----- */
+.admin-events-list{ display:flex; flex-direction:column; gap:12px; }
+.admin-event-row{
+  display:flex; align-items:center; gap:14px;
+  background: var(--bg); border:1px solid var(--border); border-radius:8px;
+  padding: 12px 14px;
+}
+.admin-event-thumb{
+  width:56px; height:56px; border-radius:6px; overflow:hidden; flex-shrink:0;
+  background: var(--bg-card);
+}
+.admin-event-thumb img{ width:100%; height:100%; object-fit:cover; }
+.admin-event-info{ flex:1; min-width:0; }
+.admin-event-info strong{ display:block; font-size:14px; font-weight:600; margin-bottom:3px; }
+.admin-event-info span{ display:block; color: var(--text-dim); font-size:12.5px; }
+.admin-event-actions{ display:flex; gap:8px; flex-shrink:0; }
+.admin-icon-btn{
+  width:32px; height:32px; border-radius:6px; border:1px solid var(--border); background:transparent;
+  color: var(--text-dim); display:flex; align-items:center; justify-content:center;
+  transition: border-color .2s ease, color .2s ease;
+}
+.admin-icon-btn:hover{ border-color: var(--accent); color: var(--accent-bright); }
+.admin-icon-btn.is-danger:hover{ border-color:#ff6b47; color:#ff6b47; }
+
+.admin-empty{ color: var(--text-dim); font-size:13.5px; text-align:center; padding: 20px 0; }
+
+@media (max-width: 760px){
+  .admin-grid{ grid-template-columns: 1fr; }
+  .admin-form-row{ grid-template-columns: 1fr; }
+}

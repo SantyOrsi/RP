@@ -101,14 +101,14 @@ button{ font-family:inherit; cursor:pointer; }
 /* ============ HEADER ============ */
 .site-header{
   position: sticky; top:0; z-index:100;
-  height: var(--header-h);
-  display:flex; align-items:center;
+  display:flex; flex-direction:column;
   background: rgba(8,10,13,.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
 .header-inner{
   width:100%; max-width: 1360px; margin:0 auto;
+  height: var(--header-h);
   padding: 0 28px;
   display:flex; align-items:center; justify-content:space-between; gap:24px;
 }
@@ -293,6 +293,7 @@ button{ font-family:inherit; cursor:pointer; }
   padding: 6px 12px; border-radius:5px;
 }
 .event-body{ padding: 22px 24px 26px; }
+.event-loading, .event-empty{ color: var(--text-dim); font-size:14px; padding: 30px 4px; text-align:center; }
 .event-body h3{ font-size:22px; font-weight:700; margin-bottom:16px; }
 .event-meta{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
 .event-meta li{ display:flex; align-items:center; gap:10px; color: var(--text-dim); font-size:14px; }

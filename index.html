@@ -39,8 +39,8 @@
       <button class="icon-btn" aria-label="Buscar">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <a href="#" class="link-plain header-login">INICIAR SESIÓN</a>
-      <a href="#" class="btn btn-primary btn-sm">UNITE A RPM</a>
+      <a href="auth.html" class="link-plain header-login">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary btn-sm">UNITE A RPM</a>
       <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -56,8 +56,8 @@
     <a href="#magazine">MAGAZINE</a>
     <a href="#tienda">TIENDA</a>
     <div class="mobile-drawer-actions">
-      <a href="#" class="link-plain">INICIAR SESIÓN</a>
-      <a href="#" class="btn btn-primary">UNITE A RPM</a>
+      <a href="auth.html" class="link-plain">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary">UNITE A RPM</a>
     </div>
   </div>
 </header>
@@ -77,7 +77,7 @@
     <p class="hero-text">Compartí tu pasión, descubrí autos increíbles, conectá con gente y llevá tu proyecto al siguiente nivel.</p>
     <div class="hero-ctas">
       <a href="#garage" class="btn btn-primary">EXPLORAR GARAGE <span aria-hidden="true">→</span></a>
-      <a href="#" class="btn btn-outline">UNITE A RPM</a>
+      <a href="auth.html" class="btn btn-outline">UNITE A RPM</a>
     </div>
   </div>
 </section>
@@ -216,19 +216,11 @@
     </a>
   </div>
 
-  <div class="event-card" id="eventos">
-    <div class="event-img">
-      <img src="https://images.unsplash.com/photo-1541348263662-e068662d82af?auto=format&fit=crop&w=900&q=70" alt="RPM Meet" loading="lazy">
-      <span class="event-tag">PRÓXIMO EVENTO</span>
-    </div>
-    <div class="event-body">
-      <h3>RPM MEET #01</h3>
-      <ul class="event-meta">
-        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> Sábado 14 de Septiembre</li>
-        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> 15:00 hs</li>
-        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario, Santa Fe</li>
-      </ul>
-      <a href="#" class="btn btn-primary btn-sm">VER EVENTO <span aria-hidden="true">→</span></a>
+  <div class="event-card-wrap" id="eventos">
+    <div class="event-card" id="eventContainer">
+      <div class="event-body event-loading">
+        <p>Cargando próximo evento…</p>
+      </div>
     </div>
   </div>
 </section>
@@ -333,6 +325,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

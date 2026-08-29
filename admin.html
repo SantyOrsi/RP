@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de eventos · RPM Rosario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="auth.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="auth-body">
+
+<a href="index.html" class="logo auth-logo" aria-label="RPM Rosario - Inicio">
+  <svg class="logo-mark" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g>
+      <path d="M0 30 L28 27 L0 24" fill="var(--accent)"/>
+      <path d="M8 34 L32 30.5 L8 27" fill="var(--accent)" opacity="0.6"/>
+      <path d="M16 38 L36 34 L16 30" fill="var(--accent)" opacity="0.35"/>
+    </g>
+    <text x="34" y="42" class="logo-text-rpm">RPM</text>
+  </svg>
+  <span class="logo-sub">ROSARIO</span>
+</a>
+
+<!-- ===== Pantalla de login (se muestra si todavía no hay sesión admin) ===== -->
+<main class="auth-wrap" id="loginGate">
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab is-active" type="button">PANEL DE EVENTOS</button>
+    </div>
+    <section class="auth-panel is-active">
+      <p class="auth-subtitle">Iniciá sesión con tu cuenta de administrador.</p>
+      <form id="adminLoginForm" class="auth-form" novalidate>
+        <label class="auth-field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="tu@email.com">
+        </label>
+        <label class="auth-field">
+          <span>Contraseña</span>
+          <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+        </label>
+        <p class="auth-message" id="adminLoginMessage" hidden></p>
+        <button type="submit" class="btn btn-primary auth-submit">INICIAR SESIÓN</button>
+      </form>
+    </section>
+  </div>
+</main>
+
+<!-- ===== Panel (se muestra solo si la cuenta logueada es admin) ===== -->
+<main class="admin-wrap" id="adminPanel" hidden>
+  <div class="admin-head">
+    <div>
+      <h1>PANEL DE EVENTOS</h1>
+      <p id="adminUserLabel"></p>
+    </div>
+    <button class="btn btn-outline btn-sm" id="logoutBtn">CERRAR SESIÓN</button>
+  </div>
+
+  <div class="admin-grid">
+    <!-- Formulario para crear / editar -->
+    <section class="admin-card">
+      <h2 id="formTitle">CARGAR EVENTO</h2>
+      <form id="eventForm" class="auth-form" novalidate>
+        <input type="hidden" name="id" value="">
+
+        <label class="auth-field">
+          <span>Título</span>
+          <input type="text" name="title" required placeholder="Ej: RPM Meet #02">
+        </label>
+
+        <div class="admin-form-row">
+          <label class="auth-field">
+            <span>Fecha</span>
+            <input type="date" name="event_date" required>
+          </label>
+          <label class="auth-field">
+            <span>Hora</span>
+            <input type="time" name="event_time">
+          </label>
+        </div>
+
+        <label class="auth-field">
+          <span>Lugar</span>
+          <input type="text" name="location" placeholder="Ej: Rosario, Santa Fe">
+        </label>
+
+        <label class="auth-field">
+          <span>URL de imagen</span>
+          <input type="url" name="image_url" placeholder="https://...">
+        </label>
+
+        <label class="auth-field">
+          <span>Descripción</span>
+          <textarea name="description" rows="3" placeholder="Detalles del evento…"></textarea>
+        </label>
+
+        <p class="auth-message" id="eventFormMessage" hidden></p>
+
+        <div class="admin-form-actions">
+          <button type="submit" class="btn btn-primary auth-submit" id="eventFormSubmit">CREAR EVENTO</button>
+          <button type="button" class="btn btn-outline" id="cancelEditBtn" hidden>CANCELAR EDICIÓN</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Lista de eventos existentes -->
+    <section class="admin-card">
+      <h2>EVENTOS CARGADOS</h2>
+      <div id="eventsList" class="admin-events-list">
+        <p class="auth-subtitle">Cargando eventos…</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
