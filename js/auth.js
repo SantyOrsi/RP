@@ -3,6 +3,22 @@
 // de cuenta (particular / concesionaria) y el registro/login contra
 // Supabase Auth.
 
+// ----- Turnstile (captcha) -----
+// Se renderiza "a mano" (en vez de automático) porque el panel de
+// registro arranca oculto (display:none) y Turnstile no puede dibujarse
+// bien adentro de algo oculto. Por eso el widget del login se dibuja
+// apenas carga la página, y el de registro recién cuando se abre esa tab.
+const TURNSTILE_SITE_KEY = '0x4AAAAAAEgO0vN3QbVTSUnS';
+let turnstileLoginId = null;
+let turnstileRegisterId = null;
+
+window.onTurnstileReady = function () {
+  turnstileLoginId = window.turnstile.render('#turnstileLogin', {
+    sitekey: TURNSTILE_SITE_KEY,
+    theme: 'dark',
+  });
+};
+
 // ----- Tabs -----
 const tabs = document.querySelectorAll('.auth-tab');
 const panels = {
@@ -18,6 +34,15 @@ tabs.forEach(tab => {
 
     Object.values(panels).forEach(p => p.classList.remove('is-active'));
     panels[tab.dataset.tab].classList.add('is-active');
+
+    // El panel ya está visible en este punto: recién ahora se puede
+    // dibujar el widget de registro, si todavía no se dibujó.
+    if (tab.dataset.tab === 'register' && turnstileRegisterId === null && window.turnstile) {
+      turnstileRegisterId = window.turnstile.render('#turnstileRegister', {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: 'dark',
+      });
+    }
   });
 });
 
@@ -29,7 +54,7 @@ const razonSocialInput = fieldRazonSocial.querySelector('input[name="razon_socia
 const fieldDatosPersonales = document.getElementById('fieldDatosPersonales');
 const nombreInput = fieldDatosPersonales.querySelector('input[name="nombre"]');
 const apellidoInput = fieldDatosPersonales.querySelector('input[name="apellido"]');
-const dniInput = fieldDatosPersonales.querySelector('input[name="dni"]');
+const documentoInput = document.getElementById('documentoInput');
 
 accountTypeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -41,21 +66,68 @@ accountTypeBtns.forEach(btn => {
     accountTypeInput.value = tipo;
 
     const esConcesionaria = tipo === 'concesionaria';
+
     fieldRazonSocial.hidden = !esConcesionaria;
     razonSocialInput.required = esConcesionaria;
     if (!esConcesionaria) razonSocialInput.value = '';
 
     fieldDatosPersonales.hidden = esConcesionaria;
-    nombreInput.required = !esConcesionaria;
-    apellidoInput.required = !esConcesionaria;
-    dniInput.required = !esConcesionaria;
     if (esConcesionaria) {
       nombreInput.value = '';
       apellidoInput.value = '';
-      dniInput.value = '';
+      documentoInput.value = '';
     }
   });
 });
+
+// ----- Selector de tipo de documento (DNI / CUIT), solo para particular -----
+const docTypeBtns = document.querySelectorAll('.doc-type-btn');
+const docTypeInput = document.querySelector('#registerForm input[name="documento_tipo"]');
+const documentoLabel = document.getElementById('documentoLabel');
+
+docTypeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    docTypeBtns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-checked', 'false'); });
+    btn.classList.add('is-active');
+    btn.setAttribute('aria-checked', 'true');
+
+    const tipo = btn.dataset.docType; // 'dni' o 'cuit'
+    docTypeInput.value = tipo;
+    documentoInput.value = '';
+
+    if (tipo === 'cuit') {
+      documentoLabel.textContent = 'CUIT';
+      documentoInput.placeholder = 'Ej: 20345678901';
+      documentoInput.maxLength = 13; // admite guiones tipo 20-34567890-1
+    } else {
+      documentoLabel.textContent = 'DNI';
+      documentoInput.placeholder = 'Ej: 30123456';
+      documentoInput.maxLength = 8;
+    }
+  });
+});
+
+// ----- Validación de DNI -----
+function validarDni(valor) {
+  const limpio = valor.replace(/\D/g, '');
+  return /^\d{7,8}$/.test(limpio);
+}
+
+// ----- Validación de CUIT (formato + dígito verificador real) -----
+function validarCuit(valor) {
+  const limpio = valor.replace(/\D/g, '');
+  if (!/^\d{11}$/.test(limpio)) return false;
+
+  const digitos = limpio.split('').map(Number);
+  const multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  const suma = digitos.slice(0, 10).reduce((acc, d, i) => acc + d * multiplicadores[i], 0);
+  const resto = suma % 11;
+  let verificador = 11 - resto;
+  if (verificador === 11) verificador = 0;
+  if (verificador === 10) verificador = 9;
+
+  return verificador === digitos[10];
+}
 
 // ----- Helper para mostrar mensajes -----
 function mostrarMensaje(el, texto, esExito = false) {
@@ -89,10 +161,12 @@ loginForm.addEventListener('submit', async (e) => {
   const { error } = await supabaseClient.auth.signInWithPassword({
     email: datos.email,
     password: datos.password,
+    options: { captchaToken: datos['cf-turnstile-response'] },
   });
 
   if (error) {
     mostrarMensaje(loginMessage, traducirError(error.message));
+    if (window.turnstile) window.turnstile.reset(turnstileLoginId);
     btn.disabled = false;
     return;
   }
@@ -116,7 +190,8 @@ registerForm.addEventListener('submit', async (e) => {
   const razonSocial = (formData.get('razon_social') || '').trim();
   const nombre = (formData.get('nombre') || '').trim();
   const apellido = (formData.get('apellido') || '').trim();
-  const dni = (formData.get('dni') || '').trim();
+  const documentoTipo = formData.get('documento_tipo') || 'dni';
+  const documento = (formData.get('documento') || '').trim();
 
   if (password !== passwordConfirm) {
     mostrarMensaje(registerMessage, 'Las contraseñas no coinciden.');
@@ -126,18 +201,28 @@ registerForm.addEventListener('submit', async (e) => {
     mostrarMensaje(registerMessage, 'La contraseña debe tener al menos 8 caracteres.');
     return;
   }
-  if (accountType === 'concesionaria' && razonSocial.length < 3) {
-    mostrarMensaje(registerMessage, 'Ingresá la razón social de la concesionaria (mínimo 3 caracteres).');
-    return;
-  }
-  if (accountType === 'particular') {
+
+  if (accountType === 'concesionaria') {
+    if (razonSocial.length < 3) {
+      mostrarMensaje(registerMessage, 'Ingresá la razón social de la concesionaria (mínimo 3 caracteres).');
+      return;
+    }
+  } else {
+    // Particular: nombre, apellido y DNI o CUIT (validado de verdad, no solo formato).
     if (nombre.length < 2 || apellido.length < 2) {
       mostrarMensaje(registerMessage, 'Ingresá tu nombre y apellido.');
       return;
     }
-    if (!/^\d{7,8}$/.test(dni)) {
-      mostrarMensaje(registerMessage, 'Ingresá un DNI válido (7 u 8 dígitos).');
-      return;
+    if (documentoTipo === 'cuit') {
+      if (!validarCuit(documento)) {
+        mostrarMensaje(registerMessage, 'El CUIT ingresado no es válido. Revisá los 11 números.');
+        return;
+      }
+    } else {
+      if (!validarDni(documento)) {
+        mostrarMensaje(registerMessage, 'El DNI ingresado no es válido (debe tener 7 u 8 números).');
+        return;
+      }
     }
   }
 
@@ -155,19 +240,23 @@ registerForm.addEventListener('submit', async (e) => {
         razon_social: accountType === 'concesionaria' ? razonSocial : null,
         nombre: accountType === 'particular' ? nombre : null,
         apellido: accountType === 'particular' ? apellido : null,
-        dni: accountType === 'particular' ? dni : null,
+        documento_tipo: accountType === 'particular' ? documentoTipo : null,
+        documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
       },
       emailRedirectTo: window.location.origin + '/index.html',
+      captchaToken: formData.get('cf-turnstile-response'),
     },
   });
 
   if (error) {
     mostrarMensaje(registerMessage, traducirError(error.message));
+    if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
     btn.disabled = false;
     return;
   }
 
   mostrarMensaje(registerMessage, 'Cuenta creada. Te enviamos un mail para confirmarla.', true);
   registerForm.reset();
+  if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
   btn.disabled = false;
 });

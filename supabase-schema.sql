@@ -4,6 +4,16 @@
 -- =========================================================
 
 -- ---------------------------------------------------------
+-- 0) LIMPIEZA (por si el script ya se corrió antes o quedó
+--    algo a medio crear). Como confirmamos que profiles está
+--    vacía, esto no borra datos reales, solo la estructura.
+-- ---------------------------------------------------------
+drop trigger if exists on_auth_user_created on auth.users;
+drop function if exists public.handle_new_user();
+drop table if exists public.events cascade;
+drop table if exists public.profiles cascade;
+
+-- ---------------------------------------------------------
 -- 1) PERFILES (particular / concesionaria)
 -- ---------------------------------------------------------
 -- Guarda los datos extra que Supabase Auth no maneja por
@@ -13,7 +23,11 @@
 create table public.profiles (
   id uuid references auth.users on delete cascade primary key,
   account_type text not null check (account_type in ('particular', 'concesionaria')),
-  razon_social text,
+  razon_social text,          -- solo para 'concesionaria'
+  nombre text,                 -- solo para 'particular'
+  apellido text,                -- solo para 'particular'
+  documento_tipo text check (documento_tipo in ('dni', 'cuit')), -- solo para 'particular'
+  documento text,               -- solo para 'particular' (dígitos sin puntos ni guiones)
   email text,
   is_admin boolean not null default false,
   created_at timestamptz default now()
@@ -31,15 +45,20 @@ create policy "Cada usuario edita su propio perfil"
 
 -- Trigger: cuando alguien se registra en Auth, se crea
 -- automáticamente su fila en profiles con los datos que
--- mandamos en el signUp (account_type, razon_social).
+-- mandamos en el signUp (account_type, razon_social, o
+-- nombre/apellido/documento si es particular).
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, account_type, razon_social, email)
+  insert into public.profiles (id, account_type, razon_social, nombre, apellido, documento_tipo, documento, email)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'account_type', 'particular'),
     new.raw_user_meta_data->>'razon_social',
+    new.raw_user_meta_data->>'nombre',
+    new.raw_user_meta_data->>'apellido',
+    new.raw_user_meta_data->>'documento_tipo',
+    new.raw_user_meta_data->>'documento',
     new.email
   );
   return new;

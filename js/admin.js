@@ -70,10 +70,12 @@ adminLoginForm.addEventListener('submit', async (e) => {
   const { error } = await supabaseClient.auth.signInWithPassword({
     email: datos.email,
     password: datos.password,
+    options: { captchaToken: datos['cf-turnstile-response'] },
   });
 
   if (error) {
     mostrarMensaje(adminLoginMessage, 'Email o contraseña incorrectos.');
+    if (window.turnstile) window.turnstile.reset();
     return;
   }
 
