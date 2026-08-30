@@ -57,7 +57,7 @@
   background: rgba(0,191,255,.08);
 }
 
-.doc-type{ display:flex; gap:8px; margin-bottom:14px; }
+.doc-type{ display:flex; gap:8px; margin-top: 6px; margin-bottom:14px; }
 .doc-type-btn{
   flex:1; padding: 9px 10px;
   background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
@@ -95,6 +95,8 @@
 .auth-message.is-success{
   background: rgba(0,191,255,.1); border-color: rgba(0,191,255,.4); color: var(--accent-bright);
 }
+
+[hidden], .is-hidden{ display: none !important; }
 
 @media (max-width:480px){
   .auth-card{ border-radius:12px; }

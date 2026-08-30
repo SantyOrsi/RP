@@ -1,0 +1,64 @@
+/* perfil.css — página de perfil (usa las variables de styles.css) */
+
+.perfil-wrap{
+  width:100%; max-width: 640px; margin: 36px auto 60px; padding: 0 20px;
+  display:flex; flex-direction:column; gap:18px;
+}
+
+.perfil-card{
+  background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius);
+  padding: 24px 26px;
+}
+.perfil-card--centrado{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.perfil-card h2{
+  font-family: var(--font-display); font-size:14px; font-weight:700; letter-spacing:.08em;
+  color: var(--accent); margin-bottom:16px;
+}
+
+/* ----- Header del perfil ----- */
+.perfil-header{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+.perfil-avatar{
+  width:64px; height:64px; border-radius:50%; flex-shrink:0;
+  background: rgba(0,191,255,.1); color: var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  position: relative; overflow: hidden;
+}
+.cambiar-foto-btn{
+  position: absolute; bottom:-2px; right:-2px; width:28px; height:28px;
+  background: var(--accent); color: var(--bg-card); border:none; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.cambiar-foto-btn:hover{ transform: scale(1.1); }
+.perfil-datos{ flex:1; min-width:200px; }
+.perfil-tipo{
+  display:inline-block; font-family: var(--font-display); font-size:11px; font-weight:700;
+  letter-spacing:.08em; color: var(--accent-bright);
+  background: rgba(0,191,255,.1); border:1px solid rgba(0,191,255,.3);
+  padding: 3px 10px; border-radius:5px; margin-bottom:8px;
+}
+.perfil-datos h1{ font-size:22px; font-weight:700; margin-bottom:8px; }
+.perfil-rating{ display:flex; align-items:center; gap:10px; }
+.perfil-estrellas{ color: var(--accent); font-size:16px; letter-spacing:2px; }
+#perfilRatingTexto{ color: var(--text-dim); font-size:13px; }
+
+/* ----- Calificar (estrellas clickeables) ----- */
+.estrellas-input{ display:flex; gap:6px; }
+.estrella-btn{
+  background:none; border:none; font-size:32px; line-height:1; cursor:pointer;
+  color: var(--border); transition: color .15s ease, transform .1s ease;
+}
+.estrella-btn:hover{ transform: scale(1.1); }
+.estrella-btn.is-filled{ color: var(--accent); }
+
+/* ----- Autos publicados (vacío por ahora) ----- */
+.perfil-empty{
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  color: var(--text-dim); text-align:center; padding: 34px 10px;
+}
+.perfil-empty p{ font-size:14px; line-height:1.5; }
+
+@media (max-width:480px){
+  .perfil-header{ flex-direction:column; text-align:center; }
+  .perfil-rating{ justify-content:center; }
+}

@@ -39,8 +39,8 @@
       <button class="icon-btn" aria-label="Buscar">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <a href="auth.html" class="link-plain header-login">INICIAR SESIÓN</a>
-      <a href="auth.html" class="btn btn-primary btn-sm">UNITE A RPM</a>
+      <a href="auth.html" class="link-plain header-login" id="navLoginLink">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary btn-sm" id="navJoinBtn">UNITE A RPM</a>
       <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -56,8 +56,8 @@
     <a href="#magazine">MAGAZINE</a>
     <a href="#tienda">TIENDA</a>
     <div class="mobile-drawer-actions">
-      <a href="auth.html" class="link-plain">INICIAR SESIÓN</a>
-      <a href="auth.html" class="btn btn-primary">UNITE A RPM</a>
+      <a href="auth.html" class="link-plain" id="navLoginLinkMobile">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary" id="navJoinBtnMobile">UNITE A RPM</a>
     </div>
   </div>
 </header>
@@ -327,6 +327,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/nav-auth.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

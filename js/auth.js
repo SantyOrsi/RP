@@ -1,13 +1,6 @@
 // public/js/auth.js
-// Maneja las tabs (iniciar sesión / crear cuenta), el selector de tipo
-// de cuenta (particular / concesionaria) y el registro/login contra
-// Supabase Auth.
 
 // ----- Turnstile (captcha) -----
-// Se renderiza "a mano" (en vez de automático) porque el panel de
-// registro arranca oculto (display:none) y Turnstile no puede dibujarse
-// bien adentro de algo oculto. Por eso el widget del login se dibuja
-// apenas carga la página, y el de registro recién cuando se abre esa tab.
 const TURNSTILE_SITE_KEY = '0x4AAAAAAEgO0vN3QbVTSUnS';
 let turnstileLoginId = null;
 let turnstileRegisterId = null;
@@ -35,8 +28,6 @@ tabs.forEach(tab => {
     Object.values(panels).forEach(p => p.classList.remove('is-active'));
     panels[tab.dataset.tab].classList.add('is-active');
 
-    // El panel ya está visible en este punto: recién ahora se puede
-    // dibujar el widget de registro, si todavía no se dibujó.
     if (tab.dataset.tab === 'register' && turnstileRegisterId === null && window.turnstile) {
       turnstileRegisterId = window.turnstile.render('#turnstileRegister', {
         sitekey: TURNSTILE_SITE_KEY,
@@ -56,29 +47,48 @@ const nombreInput = fieldDatosPersonales.querySelector('input[name="nombre"]');
 const apellidoInput = fieldDatosPersonales.querySelector('input[name="apellido"]');
 const documentoInput = document.getElementById('documentoInput');
 
+function actualizarCamposPorTipoDeCuenta(tipo) {
+  accountTypeInput.value = tipo;
+  const esConcesionaria = tipo === 'concesionaria';
+
+  if (esConcesionaria) {
+    // Si es CONCESIONARIA: muestra Razón Social y oculta Datos Personales
+    fieldRazonSocial.removeAttribute('hidden');
+    razonSocialInput.required = true;
+
+    fieldDatosPersonales.setAttribute('hidden', '');
+    nombreInput.required = false;
+    apellidoInput.required = false;
+    documentoInput.required = false;
+
+    nombreInput.value = '';
+    apellidoInput.value = '';
+    documentoInput.value = '';
+  } else {
+    // Si es PARTICULAR: oculta Razón Social y muestra Datos Personales (Nombre, Apellido, DNI/CUIT)
+    fieldRazonSocial.setAttribute('hidden', '');
+    razonSocialInput.required = false;
+    razonSocialInput.value = '';
+
+    fieldDatosPersonales.removeAttribute('hidden');
+    nombreInput.required = true;
+    apellidoInput.required = true;
+    documentoInput.required = true;
+  }
+}
+
 accountTypeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     accountTypeBtns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-checked', 'false'); });
     btn.classList.add('is-active');
     btn.setAttribute('aria-checked', 'true');
-
-    const tipo = btn.dataset.accountType;
-    accountTypeInput.value = tipo;
-
-    const esConcesionaria = tipo === 'concesionaria';
-
-    fieldRazonSocial.hidden = !esConcesionaria;
-    razonSocialInput.required = esConcesionaria;
-    if (!esConcesionaria) razonSocialInput.value = '';
-
-    fieldDatosPersonales.hidden = esConcesionaria;
-    if (esConcesionaria) {
-      nombreInput.value = '';
-      apellidoInput.value = '';
-      documentoInput.value = '';
-    }
+    actualizarCamposPorTipoDeCuenta(btn.dataset.accountType);
   });
 });
+
+// Sincroniza los campos al cargar la página segun el botón activo
+const tipoInicial = document.querySelector('.account-type-btn.is-active')?.dataset.accountType || 'particular';
+actualizarCamposPorTipoDeCuenta(tipoInicial);
 
 // ----- Selector de tipo de documento (DNI / CUIT), solo para particular -----
 const docTypeBtns = document.querySelectorAll('.doc-type-btn');
@@ -98,7 +108,7 @@ docTypeBtns.forEach(btn => {
     if (tipo === 'cuit') {
       documentoLabel.textContent = 'CUIT';
       documentoInput.placeholder = 'Ej: 20345678901';
-      documentoInput.maxLength = 13; // admite guiones tipo 20-34567890-1
+      documentoInput.maxLength = 13;
     } else {
       documentoLabel.textContent = 'DNI';
       documentoInput.placeholder = 'Ej: 30123456';
@@ -113,7 +123,7 @@ function validarDni(valor) {
   return /^\d{7,8}$/.test(limpio);
 }
 
-// ----- Validación de CUIT (formato + dígito verificador real) -----
+// ----- Validación de CUIT -----
 function validarCuit(valor) {
   const limpio = valor.replace(/\D/g, '');
   if (!/^\d{11}$/.test(limpio)) return false;
@@ -136,7 +146,7 @@ function mostrarMensaje(el, texto, esExito = false) {
   el.classList.toggle('is-success', esExito);
 }
 
-// Traducciones básicas de los errores más comunes que devuelve Supabase
+// Traducciones básicas de errores Supabase
 function traducirError(mensaje) {
   if (!mensaje) return 'Ocurrió un error. Probá de nuevo.';
   if (mensaje.includes('Invalid login credentials')) return 'Email o contraseña incorrectos.';
@@ -208,7 +218,6 @@ registerForm.addEventListener('submit', async (e) => {
       return;
     }
   } else {
-    // Particular: nombre, apellido y DNI o CUIT (validado de verdad, no solo formato).
     if (nombre.length < 2 || apellido.length < 2) {
       mostrarMensaje(registerMessage, 'Ingresá tu nombre y apellido.');
       return;
@@ -233,8 +242,6 @@ registerForm.addEventListener('submit', async (e) => {
     email: formData.get('email'),
     password,
     options: {
-      // Esto viaja como metadata al trigger de Postgres que crea
-      // la fila en la tabla profiles (ver supabase-schema.sql).
       data: {
         account_type: accountType,
         razon_social: accountType === 'concesionaria' ? razonSocial : null,

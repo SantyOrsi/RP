@@ -75,12 +75,14 @@
       <form id="registerForm" class="auth-form" novalidate>
         <input type="hidden" name="account_type" value="particular">
 
+        <!-- Solo para Concesionaria -->
         <label class="auth-field" id="fieldRazonSocial" hidden>
           <span>Razón social</span>
           <input type="text" name="razon_social" autocomplete="organization" placeholder="Ej: Automotores del Litoral S.A.">
         </label>
 
-        <div id="fieldDatosPersonales" hidden>
+        <!-- Solo para Particular -->
+        <div id="fieldDatosPersonales">
           <label class="auth-field">
             <span>Nombre</span>
             <input type="text" name="nombre" autocomplete="given-name" placeholder="Tu nombre">
