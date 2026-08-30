@@ -3,7 +3,6 @@
 // (con /?id=UUID). Si es de otro usuario y hay sesión iniciada,
 // muestra el widget para calificarlo con estrellas.
 
-const noSesion = document.getElementById('noSesion');
 const perfilContenido = document.getElementById('perfilContenido');
 const perfilTipo = document.getElementById('perfilTipo');
 const perfilNombre = document.getElementById('perfilNombre');
@@ -178,7 +177,7 @@ async function configurarCargaFoto(userId) {
       // Guardar directamente en la BD
       const { error: updateError } = await supabaseClient
         .from('profiles')
-        .update({ avatar_data: webpBase64, updated_at: new Date().toISOString() })
+        .update({ avatar_data: webpBase64 })
         .eq('id', userId);
 
       if (updateError) {
@@ -221,7 +220,7 @@ async function iniciar() {
   const { data: { session } } = await supabaseClient.auth.getSession();
 
   if (!session) {
-    noSesion.hidden = false;
+    console.log('No hay sesión iniciada');
     return;
   }
 
@@ -236,8 +235,7 @@ async function iniciar() {
     .single();
 
   if (error || !perfil) {
-    noSesion.hidden = false;
-    noSesion.querySelector('.auth-subtitle').textContent = 'No encontramos ese perfil.';
+    console.error('No se encontró el perfil:', error);
     return;
   }
 
