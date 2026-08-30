@@ -103,9 +103,8 @@ async function cargarForos() {
     .from('forums')
     .select(`
       *,
-      category:forum_categories(name),
-      creator:profiles(display_name),
-      post_count:forum_posts(count)
+      forum_categories(name),
+      profiles(display_name)
     `)
     .order('created_at', { ascending: false });
 
@@ -117,6 +116,11 @@ async function cargarForos() {
 
   if (error || !foros) {
     console.error('Error cargando foros:', error);
+    listaForos.innerHTML = `
+      <div class="foro-empty">
+        <p>Error cargando foros. Intenta de nuevo.</p>
+      </div>
+    `;
     return;
   }
 
@@ -131,19 +135,18 @@ async function cargarForos() {
 
   listaForos.innerHTML = foros.map(foro => {
     const expirado = foroExpirado(foro.expires_at);
-    const postCount = foro.post_count?.[0]?.count || 0;
     const tiempoRest = tiempoRestante(foro.expires_at);
-    const categoria = categorias.find(c => c.id === foro.category_id);
+    const categoria = foro.forum_categories?.name || 'General';
+    const creador = foro.profiles?.display_name || 'Usuario';
 
     return `
       <div class="foro-item ${expirado ? 'foro-item--expirado' : ''}" onclick="abrirForo('${foro.id}')">
-        <span class="foro-categoria">${categoria?.name || 'General'}</span>
+        <span class="foro-categoria">${categoria}</span>
         <h3>${foro.title}</h3>
         <p>${foro.description}</p>
         <div class="foro-meta">
-          <span>Por <strong>${foro.creator?.display_name || 'Usuario'}</strong></span>
+          <span>Por <strong>${creador}</strong></span>
           <span>${formatearFecha(foro.created_at)}</span>
-          <span>${postCount} ${postCount === 1 ? 'respuesta' : 'respuestas'}</span>
           <span class="foro-estado ${expirado ? '' : 'activo'}">
             ${expirado ? '⏳ Expirado' : `⏰ ${tiempoRest}`}
           </span>
@@ -159,8 +162,8 @@ async function abrirForo(foroId) {
     .from('forums')
     .select(`
       *,
-      category:forum_categories(name),
-      creator:profiles(display_name)
+      forum_categories(name),
+      profiles(display_name)
     `)
     .eq('id', foroId)
     .single();
@@ -168,13 +171,14 @@ async function abrirForo(foroId) {
   if (error || !foro) return;
 
   foroSeleccionado = foro;
-  const categoria = categorias.find(c => c.id === foro.category_id);
+  const categoria = foro.forum_categories?.name || 'General';
+  const creador = foro.profiles?.display_name || 'Usuario';
   
-  foroCategoriaTag.textContent = categoria?.name || 'General';
+  foroCategoriaTag.textContent = categoria;
   foroTitulo.textContent = foro.title;
   foroDescripcion.textContent = foro.description;
   foroMeta.innerHTML = `
-    <span>Por <strong>${foro.creator?.display_name || 'Usuario'}</strong></span>
+    <span>Por <strong>${creador}</strong></span>
     <span>${formatearFecha(foro.created_at)}</span>
     <span class="foro-estado ${foroExpirado(foro.expires_at) ? '' : 'activo'}">
       ${foroExpirado(foro.expires_at) ? '⏳ Expirado' : `⏰ ${tiempoRestante(foro.expires_at)}`}
@@ -195,7 +199,7 @@ async function cargarPosts(foroId) {
     .from('forum_posts')
     .select(`
       *,
-      autor:profiles(display_name)
+      profiles(display_name)
     `)
     .eq('forum_id', foroId)
     .order('created_at', { ascending: true });
@@ -210,7 +214,7 @@ async function cargarPosts(foroId) {
   listaPostsContainer.innerHTML = posts.map(post => `
     <div class="post-item">
       <div class="post-header">
-        <span class="post-autor">${post.autor?.display_name || 'Usuario'}</span>
+        <span class="post-autor">${post.profiles?.display_name || 'Usuario'}</span>
         <span class="post-tiempo">${formatearFecha(post.created_at)}</span>
       </div>
       <p class="post-contenido">${post.content}</p>
