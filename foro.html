@@ -40,31 +40,6 @@
     <button class="btn btn-primary" id="crearForoBtn">+ CREAR FORO</button>
   </section>
 
-  <!-- Modal para crear foro -->
-  <div id="modalCrearForo" class="modal" hidden>
-    <div class="modal-content">
-      <button class="modal-close" id="cerrarModal">&times;</button>
-      <h2>CREAR NUEVO FORO</h2>
-      <p class="auth-subtitle">⏰ El foro durará 7 días desde su creación</p>
-      
-      <form id="formCrearForo">
-        <label for="categoriaSelect">Categoría:</label>
-        <select id="categoriaSelect" required>
-          <option value="">Selecciona una categoría...</option>
-        </select>
-
-        <label for="tituloInput">Título:</label>
-        <input type="text" id="tituloInput" placeholder="Ej: Recomendaciones de mecánicos en Rosario" required maxlength="100">
-
-        <label for="descripcionInput">Descripción:</label>
-        <textarea id="descripcionInput" placeholder="Describe el tema del foro..." required rows="4" maxlength="500"></textarea>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">CREAR FORO</button>
-        <p id="formMessage" class="auth-message" hidden></p>
-      </form>
-    </div>
-  </div>
-
   <!-- Filtro por categoría -->
   <div class="foro-filtro">
     <button class="filtro-btn is-active" data-categoria="">Todos</button>
@@ -78,7 +53,32 @@
 
 </main>
 
-<!-- Modal para ver foro y posts -->
+<!-- Modal para crear foro (FUERA de foroContenido) -->
+<div id="modalCrearForo" class="modal" hidden>
+  <div class="modal-content">
+    <button class="modal-close" id="cerrarModal">&times;</button>
+    <h2>CREAR NUEVO FORO</h2>
+    <p class="auth-subtitle">⏰ El foro durará 7 días desde su creación</p>
+    
+    <form id="formCrearForo">
+      <label for="categoriaSelect">Categoría:</label>
+      <select id="categoriaSelect" required>
+        <option value="">Selecciona una categoría...</option>
+      </select>
+
+      <label for="tituloInput">Título:</label>
+      <input type="text" id="tituloInput" placeholder="Ej: Recomendaciones de mecánicos en Rosario" required maxlength="100">
+
+      <label for="descripcionInput">Descripción:</label>
+      <textarea id="descripcionInput" placeholder="Describe el tema del foro..." required rows="4" maxlength="500"></textarea>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">CREAR FORO</button>
+      <p id="formMessage" class="auth-message" hidden></p>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para ver foro y posts (FUERA de foroContenido) -->
 <div id="modalForo" class="modal" hidden>
   <div class="modal-content modal-foro">
     <button class="modal-close" id="cerrarModalForo">&times;</button>

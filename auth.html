@@ -100,13 +100,17 @@
 
           <label class="auth-field">
             <span id="documentoLabel">DNI</span>
-            <input type="text" name="documento" id="documentoInput" inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456" maxlength="8">
+            <input type="text" name="documento" id="documentoInput" inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456" maxlength="8" pattern="[0-9]*">
           </label>
         </div>
 
         <label class="auth-field">
           <span>Email</span>
           <input type="email" name="email" required autocomplete="email" placeholder="tu@email.com">
+        </label>
+        <label class="auth-field">
+          <span>Teléfono</span>
+          <input type="tel" name="telefono" id="telefonoInput" required autocomplete="tel" placeholder="Ej: 0341 1234567" inputmode="numeric" pattern="[0-9]*">
         </label>
         <label class="auth-field">
           <span>Contraseña</span>

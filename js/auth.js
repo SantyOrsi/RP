@@ -90,6 +90,35 @@ accountTypeBtns.forEach(btn => {
 const tipoInicial = document.querySelector('.account-type-btn.is-active')?.dataset.accountType || 'particular';
 actualizarCamposPorTipoDeCuenta(tipoInicial);
 
+// ----- Permitir solo números en DNI y Teléfono -----
+function validarSoloNumeros(e) {
+  // Prevenir que se ingrese el carácter si no es un número
+  if (e.key && !/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') {
+    e.preventDefault();
+    return;
+  }
+}
+
+function limpiarNoNumeros(e) {
+  // Limpiar cualquier carácter no numérico que se haya pegado o ingresado
+  const valor = e.target.value;
+  const soloNumeros = valor.replace(/\D/g, '');
+  if (valor !== soloNumeros) {
+    e.target.value = soloNumeros;
+  }
+}
+
+// Agregar validadores al DNI
+documentInput.addEventListener('keypress', validarSoloNumeros);
+documentInput.addEventListener('input', limpiarNoNumeros);
+
+// Agregar validadores al Teléfono
+const telefonoInput = document.getElementById('telefonoInput');
+if (telefonoInput) {
+  telefonoInput.addEventListener('keypress', validarSoloNumeros);
+  telefonoInput.addEventListener('input', limpiarNoNumeros);
+}
+
 // ----- Selector de tipo de documento (DNI / CUIT), solo para particular -----
 const docTypeBtns = document.querySelectorAll('.doc-type-btn');
 const docTypeInput = document.querySelector('#registerForm input[name="documento_tipo"]');
@@ -116,6 +145,14 @@ docTypeBtns.forEach(btn => {
     }
   });
 });
+
+// ----- Validación de Teléfono -----
+function validarTelefono(valor) {
+  const limpio = valor.replace(/\D/g, '');
+  // Acepta teléfonos de 10 dígitos (formato argentino sin +54)
+  // También acepta con +54 al inicio (12 dígitos)
+  return /^\d{10}$/.test(limpio) || /^54\d{10}$/.test(limpio);
+}
 
 // ----- Validación de DNI -----
 function validarDni(valor) {
@@ -202,6 +239,16 @@ registerForm.addEventListener('submit', async (e) => {
   const apellido = (formData.get('apellido') || '').trim();
   const documentoTipo = formData.get('documento_tipo') || 'dni';
   const documento = (formData.get('documento') || '').trim();
+  const telefono = (formData.get('telefono') || '').trim();
+
+  if (!telefono) {
+    mostrarMensaje(registerMessage, 'El teléfono es obligatorio.');
+    return;
+  }
+  if (!validarTelefono(telefono)) {
+    mostrarMensaje(registerMessage, 'El teléfono debe tener 10 dígitos (ej: 0341 1234567).');
+    return;
+  }
 
   if (password !== passwordConfirm) {
     mostrarMensaje(registerMessage, 'Las contraseñas no coinciden.');
@@ -249,6 +296,7 @@ registerForm.addEventListener('submit', async (e) => {
         apellido: accountType === 'particular' ? apellido : null,
         documento_tipo: accountType === 'particular' ? documentoTipo : null,
         documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
+        telefono: telefono.replace(/\D/g, ''),
       },
       emailRedirectTo: window.location.origin + '/index.html',
       captchaToken: formData.get('cf-turnstile-response'),

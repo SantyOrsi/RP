@@ -1,0 +1,59 @@
+/* garage.css — página del Garage (usa las variables y el .modal de styles.css) */
+
+.garage-page-wrap {
+  width: 100%; max-width: 1100px; margin: 36px auto 60px; padding: 0 20px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.garage-page-header {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+}
+
+.garage-page-header h1 {
+  font-family: var(--font-display); font-size: 28px; font-weight: 700;
+  letter-spacing: .08em; color: var(--accent);
+  margin: 0;
+}
+
+/* ----- Buscador ===== */
+.garage-buscador input {
+  width: 100%; background: rgba(255, 255, 255, .05); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 16px; font-family: inherit;
+  font-size: 14px; color: var(--text);
+}
+
+.garage-buscador input:focus {
+  outline: none; border-color: var(--accent);
+  background: rgba(0, 191, 255, .05);
+}
+
+/* ----- Filtro por marca ===== */
+.garage-filtro {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+}
+
+.garage-filtro .filtro-btn {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 16px; font-size: 13px; font-weight: 600; letter-spacing: .05em;
+  color: var(--text-dim); cursor: pointer; white-space: nowrap;
+  transition: all .2s ease;
+}
+
+.garage-filtro .filtro-btn:hover, .garage-filtro .filtro-btn.is-active {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* ----- Grilla de autos ===== */
+.garage-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
+}
+
+.garage-empty {
+  color: var(--text-dim); text-align: center; padding: 40px 20px; grid-column: 1 / -1;
+}
+
+@media (max-width: 480px) {
+  .garage-page-header h1 { font-size: 22px; }
+  .garage-page-header button { width: 100%; }
+}

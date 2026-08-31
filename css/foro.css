@@ -1,5 +1,13 @@
 /* foro.css — página de foro (usa las variables de styles.css) */
 
+/* IMPORTANTE: .foro-wrap y .modal definen su propio "display",
+   así que le ganan a la regla por defecto del navegador para [hidden].
+   Esta regla se lo devuelve, sino los modales y las secciones
+   sin-sesión / con-sesión quedan siempre visibles a la vez. */
+[hidden] {
+  display: none !important;
+}
+
 .foro-wrap {
   width: 100%; max-width: 900px; margin: 36px auto 60px; padding: 0 20px;
   display: flex; flex-direction: column; gap: 24px;

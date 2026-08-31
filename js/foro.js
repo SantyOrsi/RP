@@ -23,6 +23,10 @@ const formAgregarPost = document.getElementById('formAgregarPost');
 const contenidoPost = document.getElementById('contenidoPost');
 const postMessage = document.getElementById('postMessage');
 
+// ASEGURAR que todos los modales estén cerrados al cargar
+modalCrearForo.hidden = true;
+modalForo.hidden = true;
+
 let categorias = [];
 let foroSeleccionado = null;
 let filtroActual = '';
@@ -158,6 +162,14 @@ async function cargarForos() {
 
 // Abrir foro
 async function abrirForo(foroId) {
+  // Validar sesión
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session || !session.user) {
+    alert('Debes iniciar sesión para ver los foros.');
+    window.location.href = 'auth.html';
+    return;
+  }
+
   const { data: foro, error } = await supabaseClient
     .from('forums')
     .select(`
@@ -226,8 +238,13 @@ async function cargarPosts(foroId) {
 formCrearForo.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // Validar sesión NUEVAMENTE por seguridad
   const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) return;
+  if (!session || !session.user) {
+    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+    window.location.href = 'auth.html';
+    return;
+  }
 
   const { error } = await supabaseClient.from('forums').insert([
     {
@@ -265,7 +282,11 @@ formAgregarPost.addEventListener('submit', async (e) => {
   if (!foroSeleccionado) return;
 
   const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) return;
+  if (!session || !session.user) {
+    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+    window.location.href = 'auth.html';
+    return;
+  }
 
   const { error } = await supabaseClient.from('forum_posts').insert([
     {
@@ -293,19 +314,34 @@ formAgregarPost.addEventListener('submit', async (e) => {
 });
 
 // Event listeners modales
-crearForoBtn.addEventListener('click', async () => {
+crearForoBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  // Validar sesión ANTES de abrir el modal
   const { data: { session } } = await supabaseClient.auth.getSession();
   
-  if (!session) {
+  if (!session || !session.user) {
     alert('Debes iniciar sesión para crear un foro.');
     window.location.href = 'auth.html';
     return;
   }
   
+  // ASEGURAR que otros modales estén cerrados
+  modalForo.hidden = true;
+  
+  // Limpiar formulario
+  tituloInput.value = '';
+  descripcionInput.value = '';
+  categoriaSelect.value = '';
+  formMessage.hidden = true;
+  
+  // Abrir modal
   modalCrearForo.hidden = false;
 });
 
-function confirmarCancelacion() {
+function confirmarCancelacion(e) {
+  if (e) e.preventDefault();
+  
   const tieneContenido = tituloInput.value.trim() || descripcionInput.value.trim() || categoriaSelect.value;
   
   if (!tieneContenido) {
@@ -325,7 +361,11 @@ function confirmarCancelacion() {
   }
 }
 
-cerrarModal.addEventListener('click', confirmarCancelacion);
+if (cerrarModal) {
+  cerrarModal.addEventListener('click', (e) => {
+    confirmarCancelacion(e);
+  });
+}
 
 cerrarModalForo.addEventListener('click', () => {
   modalForo.hidden = true;
@@ -334,7 +374,7 @@ cerrarModalForo.addEventListener('click', () => {
 // Cerrar modal al hacer click afuera
 modalCrearForo.addEventListener('click', (e) => {
   if (e.target === modalCrearForo) {
-    confirmarCancelacion();
+    confirmarCancelacion(e);
   }
 });
 
@@ -346,12 +386,23 @@ modalForo.addEventListener('click', (e) => {
 async function iniciar() {
   const { data: { session } } = await supabaseClient.auth.getSession();
 
-  if (!session) {
+  if (!session || !session.user) {
+    // Mostrar solo la sección de sin sesión
     noSesionForo.hidden = false;
+    foroContenido.hidden = true;
+    modalCrearForo.hidden = true;  // Asegurar que está oculto
+    modalForo.hidden = true;        // Asegurar que está oculto
+    crearForoBtn.disabled = true;
     return;
   }
 
+  // Mostrar solo la sección de foro
+  noSesionForo.hidden = true;
   foroContenido.hidden = false;
+  modalCrearForo.hidden = true;  // Los modales empiezan cerrados
+  modalForo.hidden = true;
+  crearForoBtn.disabled = false;
+  
   await cargarCategorias();
   await cargarForos();
 }

@@ -127,7 +127,7 @@
     <div>
       <p class="section-eyebrow section-eyebrow--tight">GARAGE</p>
       <h2 class="section-title">LOS FIERROS DE<br>LA COMUNIDAD.</h2>
-      <a href="#" class="btn btn-outline btn-sm">VER TODO EL GARAGE <span aria-hidden="true">→</span></a>
+      <a href="garage.html" class="btn btn-outline btn-sm">VER TODO EL GARAGE <span aria-hidden="true">→</span></a>
     </div>
     <div class="carousel-nav">
       <button class="carousel-btn" id="carPrev" aria-label="Anterior">
@@ -140,38 +140,7 @@
   </div>
 
   <div class="car-carousel" id="carCarousel">
-    <article class="car-card">
-      <div class="car-img"><img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=70" alt="BMW E36" loading="lazy"></div>
-      <div class="car-info">
-        <h3>BMW E36</h3>
-        <span class="car-user">@nicoe36</span>
-        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
-      </div>
-    </article>
-    <article class="car-card">
-      <div class="car-img"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=70" alt="Honda Civic Si" loading="lazy"></div>
-      <div class="car-info">
-        <h3>HONDA CIVIC SI</h3>
-        <span class="car-user">@civic.si</span>
-        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
-      </div>
-    </article>
-    <article class="car-card">
-      <div class="car-img"><img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=70" alt="VW Golf GTI" loading="lazy"></div>
-      <div class="car-info">
-        <h3>VW GOLF GTI</h3>
-        <span class="car-user">@gti.mk7</span>
-        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
-      </div>
-    </article>
-    <article class="car-card">
-      <div class="car-img"><img src="https://images.unsplash.com/photo-1494905998402-395d579af36f?auto=format&fit=crop&w=800&q=70" alt="Ford Mustang" loading="lazy"></div>
-      <div class="car-info">
-        <h3>FORD MUSTANG GT</h3>
-        <span class="car-user">@mustang.rsr</span>
-        <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Rosario</span>
-      </div>
-    </article>
+    <!-- Se llena dinámicamente desde Supabase (js/garage.js) — destacados -->
   </div>
 </section>
 
@@ -329,5 +298,6 @@
 <script src="js/supabase-client.js"></script>
 <script src="js/nav-auth.js"></script>
 <script src="js/script.js"></script>
+<script src="js/garage.js"></script>
 </body>
 </html>

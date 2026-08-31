@@ -248,6 +248,51 @@ button{ font-family:inherit; cursor:pointer; }
 .car-info h3{ font-size:15px; font-weight:700; letter-spacing:.04em; }
 .car-user{ color: var(--accent); font-size:13px; font-weight:600; }
 .car-loc{ display:flex; align-items:center; gap:5px; color: var(--text-dim); font-size:12.5px; }
+.car-contact-btn{ display:flex; align-items:center; justify-content:center; gap:6px; margin-top:6px; }
+
+/* ============ MODAL (publicar auto) ============ */
+/* .modal define su propio "display", así que le gana a la regla por
+   defecto del navegador para [hidden]. Esta regla se lo devuelve. */
+[hidden]{ display:none !important; }
+
+.modal{
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, .7); display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal-content{
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 32px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+  position: relative;
+}
+.modal-close{
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; font-size: 24px; color: var(--text-dim);
+  cursor: pointer; line-height: 1;
+}
+.modal-close:hover{ color: var(--text); }
+.modal h2{
+  font-family: var(--font-display); font-size: 20px; font-weight: 700;
+  letter-spacing: .08em; color: var(--accent); margin-bottom: 12px;
+}
+.auth-subtitle{ color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+
+#formPublicarAuto{ display:flex; flex-direction:column; gap:16px; }
+#formPublicarAuto label{
+  font-size: 13px; font-weight: 600; letter-spacing: .05em;
+  color: var(--text-dim); text-transform: uppercase;
+}
+#formPublicarAuto input, #formPublicarAuto textarea{
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; font-family: inherit;
+  font-size: 14px; color: var(--text);
+}
+#formPublicarAuto input:focus, #formPublicarAuto textarea:focus{
+  outline: none; border-color: var(--accent);
+  background: rgba(0, 191, 255, .05);
+}
+.auth-message{ font-size: 13px; color: #ff6347; margin-top: 4px; }
+.auth-message.is-success{ color: var(--accent-bright); }
 
 /* ============ COMMUNITY + EVENT ============ */
 .community{
