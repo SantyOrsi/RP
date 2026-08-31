@@ -1,7 +1,9 @@
 // public/js/auth.js
 
 // ----- Turnstile (captcha) -----
-const TURNSTILE_SITE_KEY = '0x4AAAAAAEgO0vN3QbVTSUnS';
+// ⚠️ TEMPORAL: sitekey de PRUEBA de Cloudflare (siempre aprueba, sirve en cualquier dominio).
+// Volver a poner la sitekey real ('0x4AAAAAAEgO0vN3QbVTSUnS') apenas tengas un dominio propio.
+const TURNSTILE_SITE_KEY = '1x00000000000000000000AA';
 let turnstileLoginId = null;
 let turnstileRegisterId = null;
 
@@ -239,15 +241,17 @@ loginForm.addEventListener('submit', async (e) => {
   
   // Obtener token de Turnstile
   let captchaToken = null;
-  if (window.turnstile && window.turnstileLoginId) {
-    captchaToken = window.turnstile.getResponse(window.turnstileLoginId);
+  if (window.turnstile && turnstileLoginId) {
+    captchaToken = window.turnstile.getResponse(turnstileLoginId);
     console.log('🎯 Captcha token obtained:', !!captchaToken);
     if (!captchaToken) {
       mostrarMensaje(loginMessage, 'Por favor completa el captcha.');
       return;
     }
   } else {
-    console.warn('⚠️ Turnstile not available, continuing without captcha');
+    console.warn('⚠️ Turnstile no cargó, no se puede continuar sin captcha');
+    mostrarMensaje(loginMessage, 'El captcha no cargó. Recargá la página e intentá de nuevo.');
+    return;
   }
   
   const btn = loginForm.querySelector('.auth-submit');
@@ -265,7 +269,7 @@ loginForm.addEventListener('submit', async (e) => {
     if (error) {
       console.error('❌ Error en login:', error);
       mostrarMensaje(loginMessage, traducirError(error.message));
-      if (window.turnstile) window.turnstile.reset(window.turnstileLoginId);
+      if (window.turnstile) window.turnstile.reset(turnstileLoginId);
       btn.disabled = false;
       btn.textContent = 'INICIAR SESIÓN';
       return;
@@ -279,7 +283,7 @@ loginForm.addEventListener('submit', async (e) => {
   } catch (err) {
     console.error('❌ Exception en login:', err);
     mostrarMensaje(loginMessage, 'Error al iniciar sesión: ' + (err.message || err));
-    if (window.turnstile) window.turnstile.reset(window.turnstileLoginId);
+    if (window.turnstile) window.turnstile.reset(turnstileLoginId);
     btn.disabled = false;
     btn.textContent = 'INICIAR SESIÓN';
   }
@@ -363,15 +367,17 @@ registerForm.addEventListener('submit', async (e) => {
 
   // Obtener token de Turnstile para registro
   let captchaToken = null;
-  if (window.turnstile && window.turnstileRegisterId) {
-    captchaToken = window.turnstile.getResponse(window.turnstileRegisterId);
+  if (window.turnstile && turnstileRegisterId) {
+    captchaToken = window.turnstile.getResponse(turnstileRegisterId);
     console.log('🎯 Captcha token para registro:', !!captchaToken);
     if (!captchaToken) {
       mostrarMensaje(registerMessage, 'Por favor completa el captcha.');
       return;
     }
   } else {
-    console.warn('⚠️ Turnstile no disponible para registro, continuando sin captcha');
+    console.warn('⚠️ Turnstile no cargó, no se puede continuar sin captcha');
+    mostrarMensaje(registerMessage, 'El captcha no cargó. Recargá la página e intentá de nuevo.');
+    return;
   }
 
   const btn = registerForm.querySelector('.auth-submit');
@@ -404,7 +410,7 @@ registerForm.addEventListener('submit', async (e) => {
     if (error) {
       console.error('❌ Error en signup:', error);
       mostrarMensaje(registerMessage, traducirError(error.message));
-      if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+      if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
       btn.disabled = false;
       btn.textContent = 'CREAR CUENTA';
       return;
@@ -415,13 +421,13 @@ registerForm.addEventListener('submit', async (e) => {
     
     mostrarMensaje(registerMessage, 'Cuenta creada. Te enviamos un mail para confirmarla.', true);
     registerForm.reset();
-    if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+    if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
     btn.disabled = false;
     btn.textContent = 'CREAR CUENTA';
   } catch (err) {
     console.error('❌ Exception en signup:', err);
     mostrarMensaje(registerMessage, 'Error al crear cuenta: ' + (err.message || err));
-    if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+    if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
     btn.disabled = false;
     btn.textContent = 'CREAR CUENTA';
   }
