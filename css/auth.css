@@ -85,6 +85,12 @@
 .auth-field input::placeholder{ color:#5b636c; }
 
 .auth-submit{ width:100%; margin-top:4px; }
+
+/* Campo trampa (honeypot): oculto para personas, los bots simples lo llenan igual */
+.hp-field{
+  position: absolute; left: -9999px; top: -9999px;
+  width: 1px; height: 1px; overflow: hidden;
+}
 .auth-fineprint{ color: var(--text-dim); font-size:12px; text-align:center; margin-top:12px; }
 .cf-turnstile-wrap{ display:flex; justify-content:center; margin: 2px 0; }
 
