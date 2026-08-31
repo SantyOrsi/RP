@@ -92,8 +92,8 @@ actualizarCamposPorTipoDeCuenta(tipoInicial);
 
 // ----- Permitir solo números en DNI y Teléfono -----
 function validarSoloNumeros(e) {
-  // Prevenir que se ingrese el carácter si no es un número
-  if (e.key && !/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Tab') {
+  // Usar keydown para mejor compatibilidad cross-browser
+  if (e.key && !/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
     e.preventDefault();
     return;
   }
@@ -108,16 +108,27 @@ function limpiarNoNumeros(e) {
   }
 }
 
+function agregarValidadoresNumero(input) {
+  if (!input) return;
+  // Usar keydown para prevenir caracteres no numéricos
+  input.addEventListener('keydown', validarSoloNumeros);
+  // Limpiar paste events
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const texto = (e.clipboardData || window.clipboardData).getData('text');
+    const soloNumeros = texto.replace(/\D/g, '');
+    e.target.value = soloNumeros;
+  });
+  // Limpiar cualquier valor después de cambios
+  input.addEventListener('input', limpiarNoNumeros);
+}
+
 // Agregar validadores al DNI
-documentInput.addEventListener('keypress', validarSoloNumeros);
-documentInput.addEventListener('input', limpiarNoNumeros);
+agregarValidadoresNumero(documentInput);
 
 // Agregar validadores al Teléfono
 const telefonoInput = document.getElementById('telefonoInput');
-if (telefonoInput) {
-  telefonoInput.addEventListener('keypress', validarSoloNumeros);
-  telefonoInput.addEventListener('input', limpiarNoNumeros);
-}
+agregarValidadoresNumero(telefonoInput);
 
 // ----- Selector de tipo de documento (DNI / CUIT), solo para particular -----
 const docTypeBtns = document.querySelectorAll('.doc-type-btn');
@@ -201,14 +212,23 @@ loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginMessage.hidden = true;
 
-  const datos = Object.fromEntries(new FormData(loginForm));
+  const formData = new FormData(loginForm);
+  const email = formData.get('email');
+  const password = formData.get('password');
+  let captchaToken = formData.get('cf-turnstile-response');
+  
+  // Si Turnstile no devolvió token, obtenerlo del window object o intentar de nuevo
+  if (!captchaToken && window.turnstile) {
+    captchaToken = window.turnstile.getResponse(turnstileLoginId);
+  }
+  
   const btn = loginForm.querySelector('.auth-submit');
   btn.disabled = true;
 
   const { error } = await supabaseClient.auth.signInWithPassword({
-    email: datos.email,
-    password: datos.password,
-    options: { captchaToken: datos['cf-turnstile-response'] },
+    email,
+    password,
+    options: { captchaToken },
   });
 
   if (error) {
@@ -230,7 +250,14 @@ registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   registerMessage.hidden = true;
 
+  // Validar que el formulario sea válido según los validadores HTML
+  if (!registerForm.checkValidity()) {
+    mostrarMensaje(registerMessage, 'Completá todos los campos requeridos.');
+    return;
+  }
+
   const formData = new FormData(registerForm);
+  const email = (formData.get('email') || '').trim();
   const password = formData.get('password');
   const passwordConfirm = formData.get('password_confirm');
   const accountType = formData.get('account_type');
@@ -241,8 +268,13 @@ registerForm.addEventListener('submit', async (e) => {
   const documento = (formData.get('documento') || '').trim();
   const telefono = (formData.get('telefono') || '').trim();
 
-  if (!telefono) {
-    mostrarMensaje(registerMessage, 'El teléfono es obligatorio.');
+  // Validar teléfono obligatoriamente
+  if (!email) {
+    mostrarMensaje(registerMessage, 'El email es obligatorio.');
+    return;
+  }
+  if (!telefono || telefono.length === 0) {
+    mostrarMensaje(registerMessage, 'El teléfono es obligatorio y no puede estar vacío.');
     return;
   }
   if (!validarTelefono(telefono)) {
