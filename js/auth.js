@@ -124,7 +124,7 @@ function agregarValidadoresNumero(input) {
 }
 
 // Agregar validadores al DNI
-agregarValidadoresNumero(documentInput);
+agregarValidadoresNumero(documentoInput);
 
 // Agregar validadores al Teléfono
 const telefonoInput = document.getElementById('telefonoInput');
@@ -189,6 +189,7 @@ function validarCuit(valor) {
 
 // ----- Helper para mostrar mensajes -----
 function mostrarMensaje(el, texto, esExito = false) {
+  console.log('📢 Mensaje:', texto, esExito ? '✅' : '❌');
   el.textContent = texto;
   el.hidden = false;
   el.classList.toggle('is-success', esExito);
@@ -197,10 +198,19 @@ function mostrarMensaje(el, texto, esExito = false) {
 // Traducciones básicas de errores Supabase
 function traducirError(mensaje) {
   if (!mensaje) return 'Ocurrió un error. Probá de nuevo.';
-  if (mensaje.includes('Invalid login credentials')) return 'Email o contraseña incorrectos.';
-  if (mensaje.includes('User already registered')) return 'Ese email ya está registrado.';
-  if (mensaje.includes('Email not confirmed')) return 'Todavía no confirmaste tu cuenta. Revisá tu email.';
-  if (mensaje.includes('Password should be at least')) return 'La contraseña debe tener al menos 8 caracteres.';
+  console.error('🔴 Error raw:', mensaje);
+  
+  const msgLower = mensaje.toLowerCase();
+  
+  if (msgLower.includes('invalid login credentials')) return 'Email o contraseña incorrectos.';
+  if (msgLower.includes('user already registered')) return 'Ese email ya está registrado.';
+  if (msgLower.includes('email not confirmed')) return 'Todavía no confirmaste tu cuenta. Revisá tu email.';
+  if (msgLower.includes('password should be at least')) return 'La contraseña debe tener al menos 8 caracteres.';
+  if (msgLower.includes('invalid email')) return 'El email no es válido.';
+  if (msgLower.includes('over_email_send_rate_limit')) return 'Demasiados intentos. Espera unos minutos.';
+  if (msgLower.includes('network')) return 'Error de conexión. Revisá tu internet.';
+  if (msgLower.includes('unauthorized')) return 'No autorizado. Probá de nuevo.';
+  
   return mensaje;
 }
 
@@ -212,34 +222,67 @@ loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginMessage.hidden = true;
 
-  const formData = new FormData(loginForm);
-  const email = formData.get('email');
-  const password = formData.get('password');
-  let captchaToken = formData.get('cf-turnstile-response');
+  console.log('🔐 Login attempt started');
   
-  // Si Turnstile no devolvió token, obtenerlo del window object o intentar de nuevo
-  if (!captchaToken && window.turnstile) {
-    captchaToken = window.turnstile.getResponse(turnstileLoginId);
+  const email = loginForm.querySelector('input[name="email"]').value.trim();
+  const password = loginForm.querySelector('input[name="password"]').value;
+  
+  // Validaciones básicas
+  if (!email) {
+    mostrarMensaje(loginMessage, 'Ingresá tu email.');
+    return;
+  }
+  if (!password) {
+    mostrarMensaje(loginMessage, 'Ingresá tu contraseña.');
+    return;
+  }
+  
+  // Obtener token de Turnstile
+  let captchaToken = null;
+  if (window.turnstile && window.turnstileLoginId) {
+    captchaToken = window.turnstile.getResponse(window.turnstileLoginId);
+    console.log('🎯 Captcha token obtained:', !!captchaToken);
+    if (!captchaToken) {
+      mostrarMensaje(loginMessage, 'Por favor completa el captcha.');
+      return;
+    }
+  } else {
+    console.warn('⚠️ Turnstile not available, continuing without captcha');
   }
   
   const btn = loginForm.querySelector('.auth-submit');
   btn.disabled = true;
+  btn.textContent = 'Iniciando sesión...';
 
-  const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password,
-    options: { captchaToken },
-  });
+  try {
+    console.log('📡 Enviando solicitud de login a Supabase...');
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken },
+    });
 
-  if (error) {
-    mostrarMensaje(loginMessage, traducirError(error.message));
-    if (window.turnstile) window.turnstile.reset(turnstileLoginId);
+    if (error) {
+      console.error('❌ Error en login:', error);
+      mostrarMensaje(loginMessage, traducirError(error.message));
+      if (window.turnstile) window.turnstile.reset(window.turnstileLoginId);
+      btn.disabled = false;
+      btn.textContent = 'INICIAR SESIÓN';
+      return;
+    }
+
+    console.log('✅ Login exitoso', data);
+    mostrarMensaje(loginMessage, '¡Listo! Iniciaste sesión.', true);
+    setTimeout(() => { 
+      window.location.href = 'index.html'; 
+    }, 900);
+  } catch (err) {
+    console.error('❌ Exception en login:', err);
+    mostrarMensaje(loginMessage, 'Error al iniciar sesión: ' + (err.message || err));
+    if (window.turnstile) window.turnstile.reset(window.turnstileLoginId);
     btn.disabled = false;
-    return;
+    btn.textContent = 'INICIAR SESIÓN';
   }
-
-  mostrarMensaje(loginMessage, '¡Listo! Iniciaste sesión.', true);
-  setTimeout(() => { window.location.href = 'index.html'; }, 900);
 });
 
 // ----- Registro -----
@@ -249,6 +292,8 @@ const registerMessage = document.getElementById('registerMessage');
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   registerMessage.hidden = true;
+
+  console.log('📝 Register attempt started');
 
   // Validar que el formulario sea válido según los validadores HTML
   if (!registerForm.checkValidity()) {
@@ -267,6 +312,8 @@ registerForm.addEventListener('submit', async (e) => {
   const documentoTipo = formData.get('documento_tipo') || 'dni';
   const documento = (formData.get('documento') || '').trim();
   const telefono = (formData.get('telefono') || '').trim();
+
+  console.log('📋 Datos del formulario:', { email, accountType, nombre, apellido, telefono });
 
   // Validar teléfono obligatoriamente
   if (!email) {
@@ -314,36 +361,68 @@ registerForm.addEventListener('submit', async (e) => {
     }
   }
 
-  const btn = registerForm.querySelector('.auth-submit');
-  btn.disabled = true;
-
-  const { error } = await supabaseClient.auth.signUp({
-    email: formData.get('email'),
-    password,
-    options: {
-      data: {
-        account_type: accountType,
-        razon_social: accountType === 'concesionaria' ? razonSocial : null,
-        nombre: accountType === 'particular' ? nombre : null,
-        apellido: accountType === 'particular' ? apellido : null,
-        documento_tipo: accountType === 'particular' ? documentoTipo : null,
-        documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
-        telefono: telefono.replace(/\D/g, ''),
-      },
-      emailRedirectTo: window.location.origin + '/index.html',
-      captchaToken: formData.get('cf-turnstile-response'),
-    },
-  });
-
-  if (error) {
-    mostrarMensaje(registerMessage, traducirError(error.message));
-    if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
-    btn.disabled = false;
-    return;
+  // Obtener token de Turnstile para registro
+  let captchaToken = null;
+  if (window.turnstile && window.turnstileRegisterId) {
+    captchaToken = window.turnstile.getResponse(window.turnstileRegisterId);
+    console.log('🎯 Captcha token para registro:', !!captchaToken);
+    if (!captchaToken) {
+      mostrarMensaje(registerMessage, 'Por favor completa el captcha.');
+      return;
+    }
+  } else {
+    console.warn('⚠️ Turnstile no disponible para registro, continuando sin captcha');
   }
 
-  mostrarMensaje(registerMessage, 'Cuenta creada. Te enviamos un mail para confirmarla.', true);
-  registerForm.reset();
-  if (window.turnstile) window.turnstile.reset(turnstileRegisterId);
-  btn.disabled = false;
+  const btn = registerForm.querySelector('.auth-submit');
+  btn.disabled = true;
+  btn.textContent = 'Creando cuenta...';
+
+  try {
+    console.log('📡 Enviando solicitud de registro a Supabase...');
+    const redirectUrl = window.location.origin + '/index.html';
+    console.log('📍 Email redirect URL:', redirectUrl);
+    
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          account_type: accountType,
+          razon_social: accountType === 'concesionaria' ? razonSocial : null,
+          nombre: accountType === 'particular' ? nombre : null,
+          apellido: accountType === 'particular' ? apellido : null,
+          documento_tipo: accountType === 'particular' ? documentoTipo : null,
+          documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
+          telefono: telefono.replace(/\D/g, ''),
+        },
+        emailRedirectTo: redirectUrl,
+        captchaToken: captchaToken,
+      },
+    });
+
+    if (error) {
+      console.error('❌ Error en signup:', error);
+      mostrarMensaje(registerMessage, traducirError(error.message));
+      if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+      btn.disabled = false;
+      btn.textContent = 'CREAR CUENTA';
+      return;
+    }
+
+    console.log('✅ Registro exitoso', data);
+    console.log('📧 Revisa tu email para confirmar la cuenta');
+    
+    mostrarMensaje(registerMessage, 'Cuenta creada. Te enviamos un mail para confirmarla.', true);
+    registerForm.reset();
+    if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+    btn.disabled = false;
+    btn.textContent = 'CREAR CUENTA';
+  } catch (err) {
+    console.error('❌ Exception en signup:', err);
+    mostrarMensaje(registerMessage, 'Error al crear cuenta: ' + (err.message || err));
+    if (window.turnstile) window.turnstile.reset(window.turnstileRegisterId);
+    btn.disabled = false;
+    btn.textContent = 'CREAR CUENTA';
+  }
 });

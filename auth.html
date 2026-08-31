@@ -85,11 +85,11 @@
         <div id="fieldDatosPersonales">
           <label class="auth-field">
             <span>Nombre</span>
-            <input type="text" name="nombre" autocomplete="given-name" placeholder="Tu nombre">
+            <input type="text" name="nombre" required autocomplete="given-name" placeholder="Tu nombre">
           </label>
           <label class="auth-field">
             <span>Apellido</span>
-            <input type="text" name="apellido" autocomplete="family-name" placeholder="Tu apellido">
+            <input type="text" name="apellido" required autocomplete="family-name" placeholder="Tu apellido">
           </label>
 
           <div class="doc-type" role="radiogroup" aria-label="Tipo de documento">
@@ -100,7 +100,7 @@
 
           <label class="auth-field">
             <span id="documentoLabel">DNI</span>
-            <input type="text" name="documento" id="documentoInput" inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456" maxlength="8" pattern="[0-9]*">
+            <input type="text" name="documento" id="documentoInput" required inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456" maxlength="8" pattern="[0-9]*">
           </label>
         </div>
 
@@ -135,6 +135,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/auth-debug.js"></script>
 <script src="js/auth.js"></script>
 </body>
 </html>
