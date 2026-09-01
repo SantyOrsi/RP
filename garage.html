@@ -61,6 +61,38 @@
       <label for="garageTituloInput">Modelo / Título:</label>
       <input type="text" id="garageTituloInput" placeholder="Ej: E36 328i" required maxlength="60">
 
+      <label for="garageAnioInput">Año:</label>
+      <input type="number" id="garageAnioInput" placeholder="Ej: 1998" min="1900" max="2099" required>
+
+      <label for="garageEstadoSelect">Estado:</label>
+      <select id="garageEstadoSelect" required>
+        <option value="">Seleccioná una opción...</option>
+        <option value="usado">Usado</option>
+        <option value="0km">0km</option>
+      </select>
+
+      <label for="garageKmInput" id="garageKmLabel">Kilómetros:</label>
+      <input type="number" id="garageKmInput" placeholder="Ej: 145000" min="0">
+
+      <label for="garageTransmisionSelect">Transmisión:</label>
+      <select id="garageTransmisionSelect" required>
+        <option value="">Seleccioná una opción...</option>
+        <option value="manual">Manual</option>
+        <option value="automatica">Automática</option>
+      </select>
+
+      <label for="garageCombustibleSelect">Combustible:</label>
+      <select id="garageCombustibleSelect" required>
+        <option value="">Seleccioná una opción...</option>
+        <option value="nafta">Nafta</option>
+        <option value="diesel">Diesel</option>
+        <option value="gnc">GNC</option>
+        <option value="electrico">Eléctrico</option>
+      </select>
+
+      <label for="garagePrecioInput">Precio (ARS):</label>
+      <input type="number" id="garagePrecioInput" placeholder="Ej: 8500000" min="0">
+
       <label for="garageUbicacionInput">Ubicación:</label>
       <input type="text" id="garageUbicacionInput" placeholder="Ej: Rosario" maxlength="60">
 
@@ -70,8 +102,9 @@
       <label for="garageWhatsappInput">WhatsApp de contacto:</label>
       <input type="tel" id="garageWhatsappInput" placeholder="Ej: 5493415551234" required>
 
-      <label for="garageImagenInput">Foto:</label>
-      <input type="file" id="garageImagenInput" accept="image/*">
+      <label for="garageImagenInput">Fotos (hasta 5):</label>
+      <input type="file" id="garageImagenInput" accept="image/*" multiple>
+      <div id="garageFotosPreview" class="garage-fotos-preview"></div>
 
       <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">PUBLICAR</button>
       <p id="garageFormMessage" class="auth-message" hidden></p>

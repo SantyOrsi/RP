@@ -248,7 +248,37 @@ button{ font-family:inherit; cursor:pointer; }
 .car-info h3{ font-size:15px; font-weight:700; letter-spacing:.04em; }
 .car-user{ color: var(--accent); font-size:13px; font-weight:600; }
 .car-loc{ display:flex; align-items:center; gap:5px; color: var(--text-dim); font-size:12.5px; }
+.car-ficha{ color: var(--text-dim); font-size:12.5px; }
+.car-precio{ color: var(--accent-bright); font-weight:700; font-size:15px; }
 .car-contact-btn{ display:flex; align-items:center; justify-content:center; gap:6px; margin-top:6px; }
+
+/* ----- Carrusel de fotos dentro de la tarjeta ----- */
+.car-img{ position:relative; overflow:hidden; }
+.car-img img{ display:none; width:100%; height:100%; object-fit:cover; }
+.car-img img.is-active{ display:block; }
+.car-img-nav{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; border-radius:50%; border:none;
+  background: rgba(0,0,0,.5); color:#fff; font-size:18px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.car-img-nav:hover{ background: rgba(0,0,0,.75); }
+.car-img-prev{ left:8px; }
+.car-img-next{ right:8px; }
+.car-img-contador{
+  position:absolute; right:8px; bottom:8px;
+  background: rgba(0,0,0,.55); color:#fff; font-size:11px;
+  padding:2px 7px; border-radius:10px;
+}
+
+/* ----- Preview de fotos elegidas en el formulario ----- */
+.garage-fotos-preview{ display:flex; flex-wrap:wrap; gap:8px; }
+.garage-foto-mini{ position:relative; width:64px; height:64px; }
+.garage-foto-mini img{ width:100%; height:100%; object-fit:cover; border-radius:6px; }
+.garage-foto-mini-quitar{
+  position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%;
+  background: #ff6347; color:#fff; border:none; font-size:12px; line-height:1; cursor:pointer;
+}
 
 /* ============ MODAL (publicar auto) ============ */
 /* .modal define su propio "display", así que le gana a la regla por

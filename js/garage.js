@@ -7,10 +7,18 @@ const cerrarModalGarage = document.getElementById('cerrarModalGarage');
 const formPublicarAuto = document.getElementById('formPublicarAuto');
 const garageMarcaInput = document.getElementById('garageMarcaInput');
 const garageTituloInput = document.getElementById('garageTituloInput');
+const garageAnioInput = document.getElementById('garageAnioInput');
+const garageEstadoSelect = document.getElementById('garageEstadoSelect');
+const garageKmInput = document.getElementById('garageKmInput');
+const garageKmLabel = document.getElementById('garageKmLabel');
+const garageTransmisionSelect = document.getElementById('garageTransmisionSelect');
+const garageCombustibleSelect = document.getElementById('garageCombustibleSelect');
+const garagePrecioInput = document.getElementById('garagePrecioInput');
 const garageUbicacionInput = document.getElementById('garageUbicacionInput');
 const garageDescripcionInput = document.getElementById('garageDescripcionInput');
 const garageWhatsappInput = document.getElementById('garageWhatsappInput');
 const garageImagenInput = document.getElementById('garageImagenInput');
+const garageFotosPreview = document.getElementById('garageFotosPreview');
 const garageFormMessage = document.getElementById('garageFormMessage');
 const garageCupoTexto = document.getElementById('garageCupoTexto');
 
@@ -20,12 +28,25 @@ const buscarModeloInput = document.getElementById('buscarModeloInput');
 const esPaginaGarageCompleta = !!garageFiltroMarca;
 const LIMITE_DESTACADOS = 6;
 
+if (garageEstadoSelect) {
+  garageEstadoSelect.addEventListener('change', () => {
+    const esUsado = garageEstadoSelect.value === 'usado';
+    garageKmInput.style.display = esUsado ? '' : 'none';
+    garageKmLabel.style.display = esUsado ? '' : 'none';
+    garageKmInput.required = esUsado;
+    if (!esUsado) garageKmInput.value = '';
+  });
+  // Estado inicial: oculto hasta elegir
+  garageKmInput.style.display = 'none';
+  garageKmLabel.style.display = 'none';
+}
+
 if (modalPublicarAuto) modalPublicarAuto.hidden = true;
 
 const LIMITE_PARTICULAR = 2;
 const LIMITE_CONCESIONARIA = 5;
 
-let imagenBase64 = null;
+let imagenesBase64 = [];
 let todasLasPublicaciones = [];
 let marcaActiva = '';
 let nombresCache = {};
@@ -82,14 +103,44 @@ function armarLinkWhatsapp(post) {
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 }
 
+function formatearPrecio(precio) {
+  if (precio === null || precio === undefined) return null;
+  return '$' + Number(precio).toLocaleString('es-AR');
+}
+
+function formatearKm(km) {
+  if (km === null || km === undefined) return null;
+  return Number(km).toLocaleString('es-AR') + ' km';
+}
+
+const ETIQUETA_TRANSMISION = { manual: 'Manual', automatica: 'Automática' };
+const ETIQUETA_COMBUSTIBLE = { nafta: 'Nafta', diesel: 'Diesel', gnc: 'GNC', electrico: 'Eléctrico' };
+
 function tarjetaAuto(post) {
+  const fotos = (post.images && post.images.length) ? post.images : (post.image_data ? [post.image_data] : []);
+  const fotoDefault = 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=70';
+
+  const fichaTecnica = [
+    post.anio,
+    post.es_usado === false ? '0km' : (post.kilometraje != null ? formatearKm(post.kilometraje) : (post.es_usado ? 'Usado' : null)),
+    ETIQUETA_TRANSMISION[post.transmision] || null,
+    ETIQUETA_COMBUSTIBLE[post.combustible] || null,
+  ].filter(Boolean).join(' · ');
+
   return `
     <article class="car-card" id="auto-${post.id}">
-      <div class="car-img">
-        <img src="${post.image_data || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=70'}" alt="${post.title}" loading="lazy">
+      <div class="car-img" data-indice="0">
+        ${fotos.map((foto, i) => `<img src="${foto}" alt="${post.title}" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') || `<img src="${fotoDefault}" alt="${post.title}" loading="lazy" class="is-active">`}
+        ${fotos.length > 1 ? `
+          <button type="button" class="car-img-nav car-img-prev" aria-label="Foto anterior">&#8249;</button>
+          <button type="button" class="car-img-nav car-img-next" aria-label="Foto siguiente">&#8250;</button>
+          <span class="car-img-contador">1 / ${fotos.length}</span>
+        ` : ''}
       </div>
       <div class="car-info">
         <h3>${post.brand ? post.brand + ' ' : ''}${post.title}</h3>
+        ${fichaTecnica ? `<span class="car-ficha">${fichaTecnica}</span>` : ''}
+        ${post.precio != null ? `<span class="car-precio">${formatearPrecio(post.precio)}</span>` : ''}
         <span class="car-user">${nombresCache[post.created_by] || 'Usuario'}</span>
         <span class="car-loc"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> ${post.location || 'Rosario'}</span>
         ${post.whatsapp ? `<a href="${armarLinkWhatsapp(post)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm car-contact-btn">
@@ -99,6 +150,33 @@ function tarjetaAuto(post) {
       </div>
     </article>
   `;
+}
+
+// Engancha los botones de prev/next de cada tarjeta (delegado una sola vez)
+function activarNavegacionFotos() {
+  carCarousel.querySelectorAll('.car-img').forEach(contenedor => {
+    const imgs = contenedor.querySelectorAll('img');
+    if (imgs.length <= 1) return;
+
+    const contador = contenedor.querySelector('.car-img-contador');
+
+    function mostrar(indice) {
+      imgs.forEach((img, i) => img.classList.toggle('is-active', i === indice));
+      contenedor.dataset.indice = indice;
+      if (contador) contador.textContent = `${indice + 1} / ${imgs.length}`;
+    }
+
+    contenedor.querySelector('.car-img-prev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const actual = Number(contenedor.dataset.indice);
+      mostrar((actual - 1 + imgs.length) % imgs.length);
+    });
+    contenedor.querySelector('.car-img-next')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const actual = Number(contenedor.dataset.indice);
+      mostrar((actual + 1) % imgs.length);
+    });
+  });
 }
 
 // Arma los botones de filtro por marca a partir de las marcas que hay publicadas
@@ -145,6 +223,7 @@ function renderizarPublicaciones() {
   }
 
   carCarousel.innerHTML = filtradas.map(post => tarjetaAuto(post)).join('');
+  activarNavegacionFotos();
 }
 
 // Cargar publicaciones del garage
@@ -209,31 +288,62 @@ if (publicarAutoBtn) {
     garageCupoTexto.textContent = `Te quedan ${tope - usadas} publicación${(tope - usadas) === 1 ? '' : 'es'} gratis.`;
 
     formPublicarAuto.reset();
-    imagenBase64 = null;
+    imagenesBase64 = [];
+    if (garageFotosPreview) garageFotosPreview.innerHTML = '';
     garageFormMessage.hidden = true;
+    if (garageKmInput) {
+      garageKmInput.style.display = 'none';
+      garageKmLabel.style.display = 'none';
+      garageKmInput.required = false;
+    }
     modalPublicarAuto.hidden = false;
+  });
+}
+
+const MAX_FOTOS = 5;
+
+function renderizarPreviewFotos() {
+  if (!garageFotosPreview) return;
+  garageFotosPreview.innerHTML = imagenesBase64.map((img, i) => `
+    <div class="garage-foto-mini">
+      <img src="${img}" alt="Foto ${i + 1}">
+      <button type="button" class="garage-foto-mini-quitar" data-index="${i}">&times;</button>
+    </div>
+  `).join('');
+
+  garageFotosPreview.querySelectorAll('.garage-foto-mini-quitar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      imagenesBase64.splice(Number(btn.dataset.index), 1);
+      renderizarPreviewFotos();
+    });
   });
 }
 
 if (garageImagenInput) {
   garageImagenInput.addEventListener('change', async () => {
-    const file = garageImagenInput.files[0];
-    if (!file) { imagenBase64 = null; return; }
-    try {
-      const resultado = await leerImagenComoWebp(file);
+    const archivos = Array.from(garageImagenInput.files);
+    garageImagenInput.value = ''; // permite volver a elegir el mismo archivo después
 
-      if (!resultado.startsWith('data:image/webp')) {
-        alert('Tu navegador no puede convertir la imagen a webP. Probá con Chrome, Firefox o Edge actualizado.');
-        imagenBase64 = null;
-        garageImagenInput.value = '';
-        return;
+    for (const file of archivos) {
+      if (imagenesBase64.length >= MAX_FOTOS) {
+        alert(`Máximo ${MAX_FOTOS} fotos por publicación.`);
+        break;
       }
+      try {
+        const resultado = await leerImagenComoWebp(file);
 
-      imagenBase64 = resultado;
-    } catch (err) {
-      console.error('Error procesando la imagen:', err);
-      imagenBase64 = null;
+        if (!resultado.startsWith('data:image/webp')) {
+          alert('Tu navegador no puede convertir la imagen a webP. Probá con Chrome, Firefox o Edge actualizado.');
+          continue;
+        }
+
+        imagenesBase64.push(resultado);
+      } catch (err) {
+        console.error('Error procesando la imagen:', err);
+      }
     }
+
+    renderizarPreviewFotos();
   });
 }
 
@@ -248,15 +358,24 @@ if (formPublicarAuto) {
       return;
     }
 
+    const esUsado = garageEstadoSelect.value === 'usado';
+
     const { error } = await supabaseClient.from('garage_posts').insert([
       {
         created_by: session.user.id,
         brand: garageMarcaInput.value,
         title: garageTituloInput.value,
+        anio: garageAnioInput.value ? Number(garageAnioInput.value) : null,
+        es_usado: esUsado,
+        kilometraje: esUsado && garageKmInput.value ? Number(garageKmInput.value) : null,
+        transmision: garageTransmisionSelect.value || null,
+        combustible: garageCombustibleSelect.value || null,
+        precio: garagePrecioInput.value ? Number(garagePrecioInput.value) : null,
         location: garageUbicacionInput.value,
         description: garageDescripcionInput.value,
         whatsapp: garageWhatsappInput.value.replace(/\D/g, ''),
-        image_data: imagenBase64
+        image_data: imagenesBase64[0] || null,
+        images: imagenesBase64.length ? imagenesBase64 : null
       }
     ]);
 

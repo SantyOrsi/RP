@@ -31,6 +31,24 @@ let categorias = [];
 let foroSeleccionado = null;
 let filtroActual = '';
 
+// Trae el nombre a mostrar de cada usuario desde la vista pública (public_profiles),
+// ya que "profiles" no tiene display_name y no se puede embeber directo desde forums/forum_posts.
+async function traerNombres(userIds) {
+  const idsUnicos = [...new Set(userIds)];
+  if (idsUnicos.length === 0) return {};
+
+  const { data, error } = await supabaseClient
+    .from('public_profiles')
+    .select('id, display_name')
+    .in('id', idsUnicos);
+
+  if (error || !data) return {};
+
+  const mapa = {};
+  data.forEach(perfil => { mapa[perfil.id] = perfil.display_name || 'Usuario'; });
+  return mapa;
+}
+
 // Formatear fecha
 function formatearFecha(fecha) {
   const date = new Date(fecha);
@@ -107,8 +125,7 @@ async function cargarForos() {
     .from('forums')
     .select(`
       *,
-      forum_categories(name),
-      profiles(display_name)
+      forum_categories(name)
     `)
     .order('created_at', { ascending: false });
 
@@ -137,11 +154,13 @@ async function cargarForos() {
     return;
   }
 
+  const nombres = await traerNombres(foros.map(f => f.created_by));
+
   listaForos.innerHTML = foros.map(foro => {
     const expirado = foroExpirado(foro.expires_at);
     const tiempoRest = tiempoRestante(foro.expires_at);
     const categoria = foro.forum_categories?.name || 'General';
-    const creador = foro.profiles?.display_name || 'Usuario';
+    const creador = nombres[foro.created_by] || 'Usuario';
 
     return `
       <div class="foro-item ${expirado ? 'foro-item--expirado' : ''}" onclick="abrirForo('${foro.id}')">
@@ -174,8 +193,7 @@ async function abrirForo(foroId) {
     .from('forums')
     .select(`
       *,
-      forum_categories(name),
-      profiles(display_name)
+      forum_categories(name)
     `)
     .eq('id', foroId)
     .single();
@@ -184,7 +202,8 @@ async function abrirForo(foroId) {
 
   foroSeleccionado = foro;
   const categoria = foro.forum_categories?.name || 'General';
-  const creador = foro.profiles?.display_name || 'Usuario';
+  const nombresCreador = await traerNombres([foro.created_by]);
+  const creador = nombresCreador[foro.created_by] || 'Usuario';
   
   foroCategoriaTag.textContent = categoria;
   foroTitulo.textContent = foro.title;
@@ -209,10 +228,7 @@ async function abrirForo(foroId) {
 async function cargarPosts(foroId) {
   const { data: posts, error } = await supabaseClient
     .from('forum_posts')
-    .select(`
-      *,
-      profiles(display_name)
-    `)
+    .select('*')
     .eq('forum_id', foroId)
     .order('created_at', { ascending: true });
 
@@ -223,10 +239,12 @@ async function cargarPosts(foroId) {
     return;
   }
 
+  const nombres = await traerNombres(posts.map(p => p.created_by));
+
   listaPostsContainer.innerHTML = posts.map(post => `
     <div class="post-item">
       <div class="post-header">
-        <span class="post-autor">${post.profiles?.display_name || 'Usuario'}</span>
+        <span class="post-autor">${nombres[post.created_by] || 'Usuario'}</span>
         <span class="post-tiempo">${formatearFecha(post.created_at)}</span>
       </div>
       <p class="post-contenido">${post.content}</p>
@@ -257,6 +275,7 @@ formCrearForo.addEventListener('submit', async (e) => {
   ]);
 
   if (error) {
+    console.error('Error al crear el foro:', error);
     formMessage.textContent = 'Error al crear el foro.';
     formMessage.classList.remove('is-success');
   } else {
@@ -268,6 +287,13 @@ formCrearForo.addEventListener('submit', async (e) => {
     
     setTimeout(() => {
       modalCrearForo.hidden = true;
+
+      // Volver a "Todos" para asegurarnos de ver el foro recién creado,
+      // sin importar qué categoría hubiera filtrada antes de crearlo.
+      filtroActual = '';
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('is-active'));
+      document.querySelector('.filtro-btn[data-categoria=""]')?.classList.add('is-active');
+
       cargarForos();
     }, 1500);
   }
