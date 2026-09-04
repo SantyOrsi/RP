@@ -21,10 +21,37 @@ const fotoMessage = document.getElementById('fotoMessage');
 const perfilAvatarImg = document.getElementById('perfilAvatarImg');
 const perfilAvatarSvg = document.getElementById('perfilAvatarSvg');
 const cambiarFotoBtn = document.getElementById('cambiarFotoBtn');
+const datosPersonalesCard = document.getElementById('datosPersonalesCard');
+const datosPersonalesLista = document.getElementById('datosPersonalesLista');
 
 function dibujarEstrellas(promedio) {
   const llenas = Math.round(promedio);
   return '★★★★★'.split('').map((_, i) => i < llenas ? '★' : '☆').join('');
+}
+
+function escaparTexto(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[caracter]));
+}
+
+function mostrarDatosPersonales(perfil) {
+  const datos = [
+    ['Nombre', perfil.nombre],
+    ['Apellido', perfil.apellido],
+    ['Documento', perfil.documento ? `${(perfil.documento_tipo || '').toUpperCase()}: ${perfil.documento}` : ''],
+    ['Provincia', perfil.provincia],
+    ['Ciudad', perfil.ciudad],
+    ['Prefijo', perfil.prefijo],
+    ['Teléfono móvil', perfil.telefono_movil],
+    ['Email', perfil.email]
+  ].filter(([, valor]) => valor);
+
+  if (!datos.length) return;
+  datosPersonalesLista.innerHTML = datos.map(([etiqueta, valor]) => `
+    <div><span>${etiqueta}</span><strong>${escaparTexto(valor)}</strong></div>
+  `).join('');
+  datosPersonalesCard.hidden = false;
 }
 
 async function cargarPromedio(userId) {
@@ -216,17 +243,64 @@ async function configurarCargaFoto(userId) {
   });
 }
 
-async function iniciar() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+function tarjetaAutoPublicada(auto) {
+  const foto = auto.images?.[0] || auto.image_data;
+  const fotoMarkup = foto
+    ? `<img src="${foto}" alt="${auto.brand ? auto.brand + ' ' : ''}${auto.title}" loading="lazy" onerror="this.onerror=null;this.src='assets/rpm.png'">`
+    : `<img src="assets/rpm.png" alt="RPM Rosario" loading="lazy">`;
+  const ficha = [auto.anio, auto.es_usado === false ? '0km' : 'Usado']
+    .filter(Boolean)
+    .join(' · ');
+  const precio = auto.precio != null
+    ? `<strong>$${Number(auto.precio).toLocaleString('es-AR')}</strong>`
+    : '';
 
-  if (!session) {
-    console.log('No hay sesión iniciada');
+  return `
+    <a class="perfil-auto-card" href="garage.html#auto-${auto.id}" aria-label="Ver publicación de ${auto.brand ? auto.brand + ' ' : ''}${auto.title} en el Garage">
+      <div class="perfil-auto-foto">
+        ${fotoMarkup}
+      </div>
+      <div class="perfil-auto-datos">
+        <h3>${auto.brand ? auto.brand + ' ' : ''}${auto.title}</h3>
+        ${ficha ? `<span>${ficha}</span>` : ''}
+        ${precio}
+        ${auto.location ? `<span>${auto.location}</span>` : ''}
+      </div>
+    </a>
+  `;
+}
+
+async function cargarAutosPublicados(userId) {
+  const { data: autos, error } = await supabaseClient
+    .from('garage_posts')
+    .select('id, brand, title, anio, es_usado, precio, location, image_data, images')
+    .eq('created_by', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('No se pudieron cargar los autos publicados:', error);
     return;
   }
 
+  if (!autos?.length) return;
+
+  autosPublicados.classList.remove('perfil-empty');
+  autosPublicados.classList.add('perfil-autos-lista');
+  autosPublicados.innerHTML = autos.map(tarjetaAutoPublicada).join('');
+}
+
+async function iniciar() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
   const params = new URLSearchParams(window.location.search);
-  const perfilUserId = params.get('id') || session.user.id;
-  const esPropio = perfilUserId === session.user.id;
+  const perfilUserId = params.get('id') || session?.user?.id;
+
+  if (!perfilUserId) {
+    console.log('No se indicó un perfil y no hay sesión iniciada');
+    return;
+  }
+
+  const esPropio = perfilUserId === session?.user?.id;
 
   const { data: perfil, error } = await supabaseClient
     .from('public_profiles')
@@ -244,6 +318,7 @@ async function iniciar() {
   perfilNombre.textContent = perfil.display_name?.trim() || 'Usuario de RPM Rosario';
 
   cargarPromedio(perfilUserId);
+  mostrarDatosPersonales(perfil);
 
   if (esPropio) {
     logoutBtn.hidden = false;
@@ -254,13 +329,11 @@ async function iniciar() {
     
     // Configurar carga de foto para el propio perfil
     await configurarCargaFoto(perfilUserId);
-  } else {
+  } else if (session) {
     configurarWidgetCalificar(session.user.id, perfilUserId);
   }
 
-  // "Autos publicados" queda como placeholder hasta que se arme la
-  // carga de autos desde el perfil (ver supabase-schema.sql para
-  // cuando se agregue esa tabla).
+  await cargarAutosPublicados(perfilUserId);
 }
 
 iniciar();

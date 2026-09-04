@@ -44,7 +44,23 @@ create policy "Cada usuario ve su propio perfil"
 
 create policy "Cada usuario edita su propio perfil"
   on public.profiles for update
-  using (auth.uid() = id);
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- Impide que una sesión web pueda autootorgarse privilegios de admin.
+create or replace function public.protect_profile_privileges()
+returns trigger as $$
+begin
+  if auth.uid() is not null and new.is_admin is distinct from old.is_admin then
+    raise exception 'No se puede modificar is_admin desde la aplicación';
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+create trigger protect_profile_privileges
+  before update on public.profiles
+  for each row execute procedure public.protect_profile_privileges();
 
 -- Trigger: cuando alguien se registra en Auth, se crea
 -- automáticamente su fila en profiles con los datos que
@@ -66,7 +82,7 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger on_auth_user_created
   after insert on auth.users
@@ -146,6 +162,16 @@ select
     else trim(coalesce(nombre, '') || ' ' || coalesce(apellido, ''))
   end as display_name,
   avatar_data,
+  nombre,
+  apellido,
+  documento_tipo,
+  documento,
+  email,
+  provincia,
+  ciudad,
+  prefijo,
+  telefono_movil,
+  telefono,
   created_at
 from public.profiles;
 

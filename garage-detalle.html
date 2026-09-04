@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publicación · Garage RPM Rosario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/garage.css">
+</head>
+<body class="auth-body">
+<a href="index.html" class="logo auth-logo" aria-label="RPM Rosario - Inicio">
+  <svg class="logo-mark" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g>
+      <path d="M0 30 L28 27 L0 24" fill="var(--accent)"/>
+      <path d="M8 34 L32 30.5 L8 27" fill="var(--accent)" opacity="0.6"/>
+      <path d="M16 38 L36 34 L16 30" fill="var(--accent)" opacity="0.35"/>
+    </g>
+    <text x="34" y="42" class="logo-text-rpm">RPM</text>
+  </svg>
+  <span class="logo-sub">ROSARIO</span>
+</a>
+
+<main class="garage-detail-wrap">
+  <a href="garage.html" class="garage-back">&larr; VOLVER AL GARAGE</a>
+  <p id="garageDetailStatus" class="garage-detail-status">Cargando publicación...</p>
+  <article id="garageDetail" class="garage-detail" hidden></article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/garage-detalle.js"></script>
+</body>
+</html>

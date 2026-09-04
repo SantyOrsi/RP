@@ -17,6 +17,12 @@ const eventFormSubmit = document.getElementById('eventFormSubmit');
 const formTitle = document.getElementById('formTitle');
 const cancelEditBtn = document.getElementById('cancelEditBtn');
 const eventsList = document.getElementById('eventsList');
+const workshopForm = document.getElementById('workshopForm');
+const workshopFormMessage = document.getElementById('workshopFormMessage');
+const workshopFormSubmit = document.getElementById('workshopFormSubmit');
+const workshopFormTitle = document.getElementById('workshopFormTitle');
+const cancelWorkshopBtn = document.getElementById('cancelWorkshopBtn');
+const workshopsList = document.getElementById('workshopsList');
 
 function mostrarMensaje(el, texto, esExito = false) {
   el.textContent = texto;
@@ -59,6 +65,7 @@ function mostrarPanel(email) {
   adminPanel.hidden = false;
   adminUserLabel.textContent = `Conectado como ${email}`;
   cargarEventos();
+  cargarTalleres();
 }
 
 // ----- Login -----
@@ -139,6 +146,70 @@ function resetFormulario() {
 }
 
 cancelEditBtn.addEventListener('click', resetFormulario);
+
+workshopForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  workshopFormMessage.hidden = true;
+  const formData = new FormData(workshopForm);
+  const id = formData.get('id');
+  const payload = {
+    name: formData.get('name'), specialty: formData.get('specialty') || null,
+    location: formData.get('location') || null, phone: formData.get('phone') || null,
+    whatsapp: formData.get('whatsapp') || null, image_url: formData.get('image_url') || null,
+    description: formData.get('description') || null, is_recommended: formData.get('is_recommended') === 'on'
+  };
+  if (!payload.name) { mostrarMensaje(workshopFormMessage, 'El nombre es obligatorio.'); return; }
+  workshopFormSubmit.disabled = true;
+  const query = id ? supabaseClient.from('workshops').update(payload).eq('id', id) : supabaseClient.from('workshops').insert(payload);
+  const { error } = await query;
+  workshopFormSubmit.disabled = false;
+  if (error) { mostrarMensaje(workshopFormMessage, 'No se pudo guardar el taller: ' + error.message); return; }
+  mostrarMensaje(workshopFormMessage, id ? 'Taller actualizado.' : 'Taller creado.', true);
+  resetWorkshopForm();
+  cargarTalleres();
+});
+
+function resetWorkshopForm() {
+  workshopForm.reset();
+  workshopForm.querySelector('input[name="id"]').value = '';
+  workshopForm.querySelector('input[name="is_recommended"]').checked = true;
+  workshopFormTitle.textContent = 'CARGAR TALLER';
+  workshopFormSubmit.textContent = 'CREAR TALLER';
+  cancelWorkshopBtn.hidden = true;
+}
+
+cancelWorkshopBtn.addEventListener('click', resetWorkshopForm);
+
+async function cargarTalleres() {
+  const { data, error } = await supabaseClient.from('workshops').select('*').order('name');
+  if (error) { workshopsList.innerHTML = '<p class="admin-empty">Ejecutá MIGRACION_TALLERES.sql para habilitar esta sección.</p>'; return; }
+  if (!data?.length) { workshopsList.innerHTML = '<p class="admin-empty">Todavía no cargaste ningún taller.</p>'; return; }
+  workshopsList.innerHTML = data.map(taller => `<div class="admin-event-row"><div class="admin-event-info"><strong>${taller.name}</strong><span>${taller.specialty || 'Sin especialidad'}${taller.is_recommended ? ' · Recomendado' : ''}</span></div><div class="admin-event-actions"><button class="admin-icon-btn" id="edit-workshop-${taller.id}" aria-label="Editar" type="button">EDIT</button><button class="admin-icon-btn is-danger" id="delete-workshop-${taller.id}" aria-label="Borrar" type="button">X</button></div></div>`).join('');
+  data.forEach(taller => {
+    document.getElementById(`edit-workshop-${taller.id}`)?.addEventListener('click', () => cargarTallerEnFormulario(taller));
+    document.getElementById(`delete-workshop-${taller.id}`)?.addEventListener('click', () => borrarTaller(taller.id));
+  });
+}
+
+function cargarTallerEnFormulario(taller) {
+  Object.entries(taller).forEach(([campo, valor]) => {
+    const input = workshopForm.querySelector(`[name="${campo}"]`);
+    if (!input || campo === 'created_at') return;
+    if (input.type === 'checkbox') input.checked = Boolean(valor);
+    else input.value = valor || '';
+  });
+  workshopFormTitle.textContent = 'EDITAR TALLER';
+  workshopFormSubmit.textContent = 'GUARDAR CAMBIOS';
+  cancelWorkshopBtn.hidden = false;
+  window.scrollTo({ top: document.getElementById('adminPanel').offsetTop, behavior: 'smooth' });
+}
+
+async function borrarTaller(id) {
+  if (!confirm('¿Seguro que querés borrar este taller?')) return;
+  const { error } = await supabaseClient.from('workshops').delete().eq('id', id);
+  if (error) { alert('No se pudo borrar: ' + error.message); return; }
+  cargarTalleres();
+}
 
 // ----- Listar eventos -----
 async function cargarEventos() {

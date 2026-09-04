@@ -87,35 +87,23 @@
   <h2 class="section-eyebrow"><span class="dash" aria-hidden="true"></span>MUCHO MÁS QUE AUTOS</h2>
   <div class="features-grid">
     <article class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h10l3 5v3a2 2 0 01-2 2M5 17h14"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg>
-      </div>
-      <h3>GARAGE</h3>
-      <p>Mostrá tu auto, tus proyectos y descubrí los de la comunidad.</p>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h10l3 5v3a2 2 0 01-2 2M5 17h14"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg></div>
+      <h3>GARAGE</h3><p>Mostrá tu auto, tus proyectos y descubrí los de la comunidad.</p>
       <a href="#garage" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-      </div>
-      <h3>COMUNIDAD</h3>
-      <p>Foros, debates, dudas y experiencias entre amantes del motor.</p>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+      <h3>COMUNIDAD</h3><p>Foros, debates, dudas y experiencias entre amantes del motor.</p>
       <a href="#comunidad" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 11-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>
-      </div>
-      <h3>ASESORAMIENTO</h3>
-      <p>Consultá a expertos y recibí asesoramiento personalizado para tu auto.</p>
-      <a href="https://wa.me/5493417046870?text=Hola,%20quiero%20asesoramiento%20sobre%20mi%20auto%20en%20RPM%20Rosario" target="_blank" class="link-arrow">CONTACTAR <span aria-hidden="true">→</span></a>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 11-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2-2.6 2.6z"/></svg></div>
+      <h3>ASESORAMIENTO</h3><p>Consultá a expertos y recibí asesoramiento personalizado para tu auto.</p>
+      <a href="https://wa.me/5493417046870?text=Hola,%20quiero%20asesoramiento%20sobre%20mi%20auto%20en%20RPM%20Rosario" target="_blank" rel="noopener" class="link-arrow">CONTACTAR <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-      </div>
-      <h3>EVENTOS</h3>
-      <p>Enterate de los próximos encuentros, expos y actividades en Rosario.</p>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+      <h3>EVENTOS</h3><p>Enterate de los próximos encuentros, expos y actividades en Rosario.</p>
       <a href="#eventos" class="link-arrow">VER MÁS <span aria-hidden="true">→</span></a>
     </article>
   </div>
@@ -152,7 +140,13 @@
     <a href="foro.html" class="btn btn-outline btn-sm">IR AL FORO <span aria-hidden="true">→</span></a>
   </div>
 
-  <div class="forum-card">
+    <div class="forum-card" id="homeForumCard" aria-live="polite">
+    <div class="forum-row forum-row--loading">
+      <span class="forum-text"><strong>Cargando conversaciones...</strong></span>
+    </div>
+    <div class="forum-row forum-row--loading" aria-hidden="true"></div>
+    <div class="forum-row forum-row--loading" aria-hidden="true"></div>
+    <!--
     <a href="#" class="forum-row">
       <span class="forum-flag forum-flag--hot" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2c1 3-2 4-2 7a3 3 0 006 0c1 1 2 2.5 2 4.5A6.5 6.5 0 0111.5 20 6.5 6.5 0 015 13.5C5 9 8 6 12 2z"/></svg>
@@ -182,7 +176,7 @@
         <em>Por LeanF · Hace 1 día</em>
       </span>
       <span class="forum-replies"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> 31 respuestas</span>
-    </a>
+    </a> -->
   </div>
 
   <div class="event-card-wrap" id="eventos">
@@ -198,8 +192,9 @@
 <section class="magazine" id="magazine">
   <p class="section-eyebrow section-eyebrow--tight">RPM MAGAZINE</p>
   <h2 class="section-title">NOTAS, GUÍAS Y MÁS.</h2>
+  <div class="magazine-status" id="magazineStatus" role="status" aria-live="polite">Cargando noticias recientes...</div>
 
-  <div class="magazine-grid">
+  <div class="magazine-grid" id="magazineGrid">
     <article class="mag-card">
       <div class="mag-img">
         <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=800&q=70" alt="" loading="lazy">

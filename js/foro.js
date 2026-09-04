@@ -31,6 +31,12 @@ let categorias = [];
 let foroSeleccionado = null;
 let filtroActual = '';
 
+function escaparHTML(valor) {
+  return String(valor || '').replace(/[&<>'"]/g, caracter => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[caracter]));
+}
+
 // Trae el nombre a mostrar de cada usuario desde la vista pública (public_profiles),
 // ya que "profiles" no tiene display_name y no se puede embeber directo desde forums/forum_posts.
 async function traerNombres(userIds) {
@@ -99,12 +105,12 @@ async function cargarCategorias() {
     
     // Llenar select
     categoriaSelect.innerHTML += data.map(cat => 
-      `<option value="${cat.id}">${cat.name}</option>`
+      `<option value="${escaparHTML(cat.id)}">${escaparHTML(cat.name)}</option>`
     ).join('');
 
     // Llenar filtros
     filtroCategoriasContainer.innerHTML = data.map(cat =>
-      `<button class="filtro-btn" data-categoria="${cat.id}">${cat.name}</button>`
+      `<button class="filtro-btn" data-categoria="${escaparHTML(cat.id)}">${escaparHTML(cat.name)}</button>`
     ).join('');
 
     // Agregar listeners a botones de filtro
@@ -164,11 +170,11 @@ async function cargarForos() {
 
     return `
       <div class="foro-item ${expirado ? 'foro-item--expirado' : ''}" onclick="abrirForo('${foro.id}')">
-        <span class="foro-categoria">${categoria}</span>
-        <h3>${foro.title}</h3>
-        <p>${foro.description}</p>
+        <span class="foro-categoria">${escaparHTML(categoria)}</span>
+        <h3>${escaparHTML(foro.title)}</h3>
+        <p>${escaparHTML(foro.description)}</p>
         <div class="foro-meta">
-          <span>Por <strong>${creador}</strong></span>
+          <span>Por <strong>${escaparHTML(creador)}</strong></span>
           <span>${formatearFecha(foro.created_at)}</span>
           <span class="foro-estado ${expirado ? '' : 'activo'}">
             ${expirado ? '⏳ Expirado' : `⏰ ${tiempoRest}`}
@@ -209,7 +215,7 @@ async function abrirForo(foroId) {
   foroTitulo.textContent = foro.title;
   foroDescripcion.textContent = foro.description;
   foroMeta.innerHTML = `
-    <span>Por <strong>${creador}</strong></span>
+    <span>Por <strong>${escaparHTML(creador)}</strong></span>
     <span>${formatearFecha(foro.created_at)}</span>
     <span class="foro-estado ${foroExpirado(foro.expires_at) ? '' : 'activo'}">
       ${foroExpirado(foro.expires_at) ? '⏳ Expirado' : `⏰ ${tiempoRestante(foro.expires_at)}`}
@@ -244,10 +250,10 @@ async function cargarPosts(foroId) {
   listaPostsContainer.innerHTML = posts.map(post => `
     <div class="post-item">
       <div class="post-header">
-        <span class="post-autor">${nombres[post.created_by] || 'Usuario'}</span>
+        <span class="post-autor">${escaparHTML(nombres[post.created_by] || 'Usuario')}</span>
         <span class="post-tiempo">${formatearFecha(post.created_at)}</span>
       </div>
-      <p class="post-contenido">${post.content}</p>
+      <p class="post-contenido">${escaparHTML(post.content)}</p>
     </div>
   `).join('');
 }

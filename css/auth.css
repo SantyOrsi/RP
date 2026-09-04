@@ -83,6 +83,18 @@
 }
 .auth-field input:focus{ outline:none; border-color: var(--accent); }
 .auth-field input::placeholder{ color:#5b636c; }
+.auth-field select{
+  background: var(--bg); border:1px solid var(--border); border-radius:6px;
+  padding: 13px 14px; color: var(--text); font-size:14.5px; font-family: var(--font-body);
+}
+.auth-field select:focus{ outline:none; border-color: var(--accent); }
+.auth-phone-row{ display:grid; grid-template-columns: 155px 1fr; gap:28px; }
+.auth-phone-row .auth-field b{ color:#ff3b30; font-weight:500; }
+
+@media (max-width:480px){
+  .auth-phone-row{ grid-template-columns: 1fr 1.8fr; gap:12px; }
+  .auth-phone-prefix input{ font-size:12px; padding-left:10px; padding-right:10px; }
+}
 
 .auth-submit{ width:100%; margin-top:4px; }
 

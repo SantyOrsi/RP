@@ -36,6 +36,9 @@
 
 .admin-form-actions{ display:flex; gap:10px; margin-top:4px; }
 .admin-form-actions .auth-submit{ margin-top:0; }
+.admin-workshops-grid{ margin-top:22px; }
+.admin-check{ display:flex; flex-direction:row; align-items:center; gap:8px; }
+.admin-check input{ width:auto; }
 
 /* ----- Lista de eventos ----- */
 .admin-events-list{ display:flex; flex-direction:column; gap:12px; }

@@ -128,9 +128,29 @@ function agregarValidadoresNumero(input) {
 // Agregar validadores al DNI
 agregarValidadoresNumero(documentoInput);
 
-// Agregar validadores al Teléfono
-const telefonoInput = document.getElementById('telefonoInput');
-agregarValidadoresNumero(telefonoInput);
+// Agregar validadores a los campos numéricos del teléfono
+const prefijoInput = document.getElementById('prefijoInput');
+const telefonoMovilInput = document.getElementById('telefonoMovilInput');
+const provinciaInput = document.getElementById('provinciaInput');
+const ciudadInput = document.getElementById('ciudadInput');
+agregarValidadoresNumero(prefijoInput);
+agregarValidadoresNumero(telefonoMovilInput);
+
+const ciudadesPorProvincia = {
+  'Buenos Aires': ['La Plata', 'Mar del Plata', 'Bahía Blanca', 'Quilmes'],
+  'Ciudad Autónoma de Buenos Aires': ['Ciudad Autónoma de Buenos Aires'],
+  'Córdoba': ['Córdoba', 'Villa Carlos Paz', 'Río Cuarto'],
+  'Entre Ríos': ['Paraná', 'Concordia', 'Gualeguaychú'],
+  'Mendoza': ['Mendoza', 'San Rafael', 'Godoy Cruz'],
+  'Santa Fe': ['Rosario', 'Santa Fe', 'Rafaela', 'Venado Tuerto'],
+  'Tucumán': ['San Miguel de Tucumán', 'Yerba Buena', 'Tafí Viejo']
+};
+
+provinciaInput.addEventListener('change', () => {
+  const ciudades = ciudadesPorProvincia[provinciaInput.value] || ['Otra ciudad'];
+  ciudadInput.innerHTML = '<option value="">Seleccionar</option>' + ciudades.map(ciudad => `<option>${ciudad}</option>`).join('');
+  ciudadInput.disabled = false;
+});
 
 // ----- Selector de tipo de documento (DNI / CUIT), solo para particular -----
 const docTypeBtns = document.querySelectorAll('.doc-type-btn');
@@ -158,14 +178,6 @@ docTypeBtns.forEach(btn => {
     }
   });
 });
-
-// ----- Validación de Teléfono -----
-function validarTelefono(valor) {
-  const limpio = valor.replace(/\D/g, '');
-  // Acepta teléfonos de 10 dígitos (formato argentino sin +54)
-  // También acepta con +54 al inicio (12 dígitos)
-  return /^\d{10}$/.test(limpio) || /^54\d{10}$/.test(limpio);
-}
 
 // ----- Validación de DNI -----
 function validarDni(valor) {
@@ -309,21 +321,29 @@ registerForm.addEventListener('submit', async (e) => {
   const apellido = (formData.get('apellido') || '').trim();
   const documentoTipo = formData.get('documento_tipo') || 'dni';
   const documento = (formData.get('documento') || '').trim();
-  const telefono = (formData.get('telefono') || '').trim();
+  const provincia = (formData.get('provincia') || '').trim();
+  const ciudad = (formData.get('ciudad') || '').trim();
+  const prefijo = (formData.get('prefijo') || '').trim();
+  const telefonoMovil = (formData.get('telefono_movil') || '').trim();
+  const telefono = `${prefijo}${telefonoMovil}`;
 
-  console.log('📋 Datos del formulario:', { email, accountType, nombre, apellido, telefono });
+  console.log('📋 Datos del formulario:', { email, accountType, nombre, apellido, provincia, ciudad, telefono });
 
   // Validar teléfono obligatoriamente
   if (!email) {
     mostrarMensaje(registerMessage, 'El email es obligatorio.');
     return;
   }
-  if (!telefono || telefono.length === 0) {
-    mostrarMensaje(registerMessage, 'El teléfono es obligatorio y no puede estar vacío.');
+  if (!provincia) {
+    mostrarMensaje(registerMessage, 'Seleccioná una provincia.');
     return;
   }
-  if (!validarTelefono(telefono)) {
-    mostrarMensaje(registerMessage, 'El teléfono debe tener 10 dígitos (ej: 0341 1234567).');
+  if (!/^\d{2,5}$/.test(prefijo)) {
+    mostrarMensaje(registerMessage, 'El prefijo es obligatorio y debe contener entre 2 y 5 números.');
+    return;
+  }
+  if (!/^\d{6,10}$/.test(telefonoMovil)) {
+    mostrarMensaje(registerMessage, 'El teléfono móvil es obligatorio y debe contener entre 6 y 10 números.');
     return;
   }
 
@@ -379,7 +399,11 @@ registerForm.addEventListener('submit', async (e) => {
           apellido: accountType === 'particular' ? apellido : null,
           documento_tipo: accountType === 'particular' ? documentoTipo : null,
           documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
-          telefono: telefono.replace(/\D/g, ''),
+          provincia,
+          ciudad: ciudad || null,
+          prefijo: prefijo.replace(/\D/g, ''),
+          telefono_movil: telefonoMovil.replace(/\D/g, ''),
+          telefono: `54${prefijo.replace(/\D/g, '')}${telefonoMovil.replace(/\D/g, '')}`,
         },
         emailRedirectTo: redirectUrl,
       },

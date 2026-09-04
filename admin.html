@@ -116,6 +116,31 @@
       </div>
     </section>
   </div>
+
+  <div class="admin-grid admin-workshops-grid">
+    <section class="admin-card">
+      <h2 id="workshopFormTitle">CARGAR TALLER</h2>
+      <form id="workshopForm" class="auth-form" novalidate>
+        <input type="hidden" name="id" value="">
+        <label class="auth-field"><span>Nombre</span><input type="text" name="name" required placeholder="Ej: Taller RPM"></label>
+        <label class="auth-field"><span>Especialidad</span><input type="text" name="specialty" placeholder="Ej: Mecánica general y BMW"></label>
+        <label class="auth-field"><span>Ubicación</span><input type="text" name="location" placeholder="Ej: Rosario, Santa Fe"></label>
+        <div class="admin-form-row">
+          <label class="auth-field"><span>Teléfono</span><input type="tel" name="phone"></label>
+          <label class="auth-field"><span>WhatsApp</span><input type="tel" name="whatsapp"></label>
+        </div>
+        <label class="auth-field"><span>URL de imagen</span><input type="url" name="image_url" placeholder="https://..."></label>
+        <label class="auth-field"><span>Descripción</span><textarea name="description" rows="3"></textarea></label>
+        <label class="auth-field admin-check"><input type="checkbox" name="is_recommended" checked><span>Mostrar como recomendado</span></label>
+        <p class="auth-message" id="workshopFormMessage" hidden></p>
+        <div class="admin-form-actions"><button type="submit" class="btn btn-primary auth-submit" id="workshopFormSubmit">CREAR TALLER</button><button type="button" class="btn btn-outline" id="cancelWorkshopBtn" hidden>CANCELAR EDICIÓN</button></div>
+      </form>
+    </section>
+    <section class="admin-card">
+      <h2>TALLERES CARGADOS</h2>
+      <div id="workshopsList" class="admin-events-list"><p class="auth-subtitle">Cargando talleres…</p></div>
+    </section>
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>

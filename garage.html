@@ -39,11 +39,29 @@
     <button class="filtro-btn is-active" data-marca="">Todas las marcas</button>
     <!-- Se llena dinámicamente con las marcas que hay publicadas -->
   </div>
+  <div class="garage-filtro" id="garageFiltroTipo">
+    <button class="filtro-btn is-active" data-tipo="">Todos los vendedores</button>
+    <button class="filtro-btn" data-tipo="particular">Particulares</button>
+    <button class="filtro-btn" data-tipo="concesionaria">Concesionarias</button>
+  </div>
 
   <!-- Grilla de autos -->
   <div id="carCarousel" class="garage-grid">
     <!-- Se llena dinámicamente desde Supabase (js/garage.js) -->
   </div>
+
+  <section class="talleres-seccion" aria-labelledby="talleresTitulo">
+    <div class="talleres-header">
+      <div>
+        <p class="garage-kicker">SERVICIOS DE CONFIANZA</p>
+        <h2 id="talleresTitulo">TALLERES RECOMENDADOS</h2>
+      </div>
+      <p class="talleres-intro">Lugares recomendados por la comunidad RPM.</p>
+    </div>
+    <div id="talleresLista" class="talleres-grid">
+      <p class="garage-empty">Todavía no hay talleres recomendados.</p>
+    </div>
+  </section>
 
 </main>
 
@@ -51,7 +69,7 @@
 <div id="modalPublicarAuto" class="modal" hidden>
   <div class="modal-content">
     <button class="modal-close" id="cerrarModalGarage">&times;</button>
-    <h2>PUBLICAR TU AUTO</h2>
+    <h2 id="garageModalTitulo">PUBLICAR TU AUTO</h2>
     <p class="auth-subtitle" id="garageCupoTexto"></p>
 
     <form id="formPublicarAuto">
@@ -99,14 +117,11 @@
       <label for="garageDescripcionInput">Descripción:</label>
       <textarea id="garageDescripcionInput" placeholder="Contá algo sobre tu auto o proyecto..." rows="4" maxlength="500"></textarea>
 
-      <label for="garageWhatsappInput">WhatsApp de contacto:</label>
-      <input type="tel" id="garageWhatsappInput" placeholder="Ej: 5493415551234" required>
-
       <label for="garageImagenInput">Fotos (hasta 5):</label>
       <input type="file" id="garageImagenInput" accept="image/*" multiple>
       <div id="garageFotosPreview" class="garage-fotos-preview"></div>
 
-      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">PUBLICAR</button>
+      <button type="submit" id="garageFormSubmit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">PUBLICAR</button>
       <p id="garageFormMessage" class="auth-message" hidden></p>
     </form>
   </div>

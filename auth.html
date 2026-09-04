@@ -112,9 +112,51 @@
           <input type="email" name="email" required autocomplete="email" placeholder="tu@email.com">
         </label>
         <label class="auth-field">
-          <span>Teléfono</span>
-          <input type="tel" name="telefono" id="telefonoInput" required autocomplete="tel" placeholder="Ej: 0341 1234567" inputmode="numeric" pattern="[0-9]*">
+          <span>* Provincia</span>
+          <select name="provincia" id="provinciaInput" required>
+            <option value="">Seleccionar</option>
+            <option>Buenos Aires</option>
+            <option>Catamarca</option>
+            <option>Chaco</option>
+            <option>Chubut</option>
+            <option>Ciudad Autónoma de Buenos Aires</option>
+            <option>Córdoba</option>
+            <option>Corrientes</option>
+            <option>Entre Ríos</option>
+            <option>Formosa</option>
+            <option>Jujuy</option>
+            <option>La Pampa</option>
+            <option>La Rioja</option>
+            <option>Mendoza</option>
+            <option>Misiones</option>
+            <option>Neuquén</option>
+            <option>Río Negro</option>
+            <option>Salta</option>
+            <option>San Juan</option>
+            <option>San Luis</option>
+            <option>Santa Cruz</option>
+            <option>Santa Fe</option>
+            <option>Santiago del Estero</option>
+            <option>Tierra del Fuego</option>
+            <option>Tucumán</option>
+          </select>
         </label>
+        <label class="auth-field">
+          <span>Ciudad</span>
+          <select name="ciudad" id="ciudadInput" autocomplete="address-level2" disabled>
+            <option value="">Seleccionar</option>
+          </select>
+        </label>
+        <div class="auth-phone-row">
+          <label class="auth-field auth-phone-prefix">
+            <span>* Prefijo</span>
+            <input type="tel" name="prefijo" id="prefijoInput" required autocomplete="tel-area-code" placeholder="OBLIGATORIO" inputmode="numeric" pattern="[0-9]{2,5}" maxlength="5">
+          </label>
+          <label class="auth-field">
+            <span>* Teléfono móvil <b>(Obligatorio)</b></span>
+            <input type="tel" name="telefono_movil" id="telefonoMovilInput" required autocomplete="tel-national" placeholder="Ej: 15 1234567" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10">
+          </label>
+        </div>
         <label class="auth-field">
           <span>Contraseña</span>
           <input type="password" name="password" required autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8">
