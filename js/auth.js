@@ -232,6 +232,10 @@ function traducirError(mensaje) {
 const loginForm = document.getElementById('loginForm');
 const loginMessage = document.getElementById('loginMessage');
 
+if (new URLSearchParams(window.location.search).get('banned') === '1') {
+  mostrarMensaje(loginMessage, 'Tu cuenta está temporalmente bloqueada.');
+}
+
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginMessage.hidden = true;
@@ -305,9 +309,21 @@ registerForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Validar que el formulario sea válido según los validadores HTML
+  // Validar formato y longitud, además de que los campos estén completos.
   if (!registerForm.checkValidity()) {
-    mostrarMensaje(registerMessage, 'Completá todos los campos requeridos.');
+    const campoInvalido = [...registerForm.elements].find(campo => !campo.disabled && !campo.checkValidity());
+    const mensajesPorCampo = {
+      password: 'La contraseña debe tener al menos 8 caracteres.',
+      password_confirm: 'Confirmá tu contraseña.',
+      documento: 'Completá un DNI o CUIT válido.',
+      prefijo: 'El prefijo debe tener entre 2 y 5 números.',
+      telefono_movil: 'El teléfono móvil debe tener entre 6 y 10 números.'
+    };
+    const mensaje = campoInvalido?.name && mensajesPorCampo[campoInvalido.name]
+      ? mensajesPorCampo[campoInvalido.name]
+      : 'Revisá el campo marcado en rojo.';
+    campoInvalido?.focus();
+    mostrarMensaje(registerMessage, mensaje);
     return;
   }
 
@@ -326,6 +342,7 @@ registerForm.addEventListener('submit', async (e) => {
   const prefijo = (formData.get('prefijo') || '').trim();
   const telefonoMovil = (formData.get('telefono_movil') || '').trim();
   const telefono = `${prefijo}${telefonoMovil}`;
+  const termsAccepted = document.getElementById('termsCheckbox')?.checked || false;
 
   console.log('📋 Datos del formulario:', { email, accountType, nombre, apellido, provincia, ciudad, telefono });
 
@@ -339,11 +356,15 @@ registerForm.addEventListener('submit', async (e) => {
     return;
   }
   if (!/^\d{2,5}$/.test(prefijo)) {
-    mostrarMensaje(registerMessage, 'El prefijo es obligatorio y debe contener entre 2 y 5 números.');
+    mostrarMensaje(registerMessage, 'El código de área debe tener entre 2 y 5 números, por ejemplo 341.');
     return;
   }
   if (!/^\d{6,10}$/.test(telefonoMovil)) {
-    mostrarMensaje(registerMessage, 'El teléfono móvil es obligatorio y debe contener entre 6 y 10 números.');
+    mostrarMensaje(registerMessage, 'El número de celular debe tener entre 6 y 10 números, sin 0 ni 15.');
+    return;
+  }
+  if (!termsAccepted) {
+    mostrarMensaje(registerMessage, 'Tenés que aceptar los Términos y Condiciones y la Política de Privacidad.');
     return;
   }
 
@@ -404,6 +425,8 @@ registerForm.addEventListener('submit', async (e) => {
           prefijo: prefijo.replace(/\D/g, ''),
           telefono_movil: telefonoMovil.replace(/\D/g, ''),
           telefono: `54${prefijo.replace(/\D/g, '')}${telefonoMovil.replace(/\D/g, '')}`,
+          terms_accepted: true,
+          terms_accepted_at: new Date().toISOString(),
         },
         emailRedirectTo: redirectUrl,
       },

@@ -381,6 +381,8 @@ button{ font-family:inherit; cursor:pointer; }
 .event-meta{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
 .event-meta li{ display:flex; align-items:center; gap:10px; color: var(--text-dim); font-size:14px; }
 .event-meta svg{ color: var(--accent); flex-shrink:0; }
+.event-attend-btn{ width:100%; }
+.event-attend-status{ color:var(--accent-bright); font-size:12.5px; margin-top:10px; }
 
 /* ============ MAGAZINE ============ */
 .magazine{ max-width: var(--container); margin: 0 auto 100px; padding: 0 28px; }

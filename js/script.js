@@ -1,23 +1,3 @@
-// ===== Mobile menu =====
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const mobileDrawer = document.getElementById('mobileDrawer');
-
-if (hamburgerBtn && mobileDrawer) {
-  hamburgerBtn.addEventListener('click', () => {
-    const isOpen = mobileDrawer.classList.toggle('is-open');
-    hamburgerBtn.classList.toggle('is-open', isOpen);
-    hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
-  });
-
-  mobileDrawer.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      mobileDrawer.classList.remove('is-open');
-      hamburgerBtn.classList.remove('is-open');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-    });
-  });
-}
-
 // ===== Car carousel arrows =====
 const carCarousel = document.getElementById('carCarousel');
 const carPrev = document.getElementById('carPrev');
@@ -36,18 +16,6 @@ if (carCarousel && carPrev && carNext) {
   });
 }
 
-// ===== Header shadow on scroll =====
-const siteHeader = document.getElementById('siteHeader');
-if (siteHeader) {
-  const toggleShadow = () => {
-    siteHeader.style.boxShadow = window.scrollY > 8
-      ? '0 8px 24px rgba(0,0,0,.35)'
-      : 'none';
-  };
-  document.addEventListener('scroll', toggleShadow, { passive: true });
-  toggleShadow();
-}
-
 // ===== Próximo evento (desde Supabase) =====
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
@@ -59,6 +27,12 @@ function formatearFecha(fechaISO) {
 function formatearHora(horaSQL) {
   if (!horaSQL) return null;
   return horaSQL.slice(0, 5) + ' hs';
+}
+
+function formatearPrecioEvento(evento) {
+  if (!evento.is_paid) return 'GRATIS';
+  if (evento.price === null || evento.price === undefined || evento.price === '') return 'PRECIO A CONFIRMAR';
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 2 }).format(Number(evento.price));
 }
 
 async function cargarProximoEvento() {
@@ -91,18 +65,69 @@ async function cargarProximoEvento() {
 
   contenedor.innerHTML = `
     <div class="event-img">
-      <img src="${imagen}" alt="${evento.title}" loading="lazy">
+      <img src="${escaparTexto(imagen)}" alt="${escaparTexto(evento.title)}" loading="lazy">
       <span class="event-tag">PRÓXIMO EVENTO</span>
     </div>
     <div class="event-body">
-      <h3>${evento.title}</h3>
+      <h3>${escaparTexto(evento.title)}</h3>
       <ul class="event-meta">
         <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg> ${formatearFecha(evento.event_date)}</li>
         ${hora ? `<li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> ${hora}</li>` : ''}
-        ${evento.location ? `<li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> ${evento.location}</li>` : ''}
+        ${evento.location ? `<li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> ${escaparTexto(evento.location)}</li>` : ''}
+        <li><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c-.6-.5-1.5-.8-2.5-.8-1.4 0-2.5.7-2.5 1.8s1 1.6 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8c-1 0-1.9-.3-2.5-.8"/></svg> ${formatearPrecioEvento(evento)}</li>
       </ul>
+      <button class="btn btn-primary btn-sm event-attend-btn" id="eventAttendBtn" type="button">QUIERO IR</button>
+      <p class="event-attend-status" id="eventAttendStatus" hidden></p>
     </div>
   `;
+
+  prepararInscripcionEvento(evento.id);
+}
+
+async function prepararInscripcionEvento(eventId) {
+  const boton = document.getElementById('eventAttendBtn');
+  const estado = document.getElementById('eventAttendStatus');
+  if (!boton || !estado) return;
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    boton.textContent = 'INICIÁ SESIÓN PARA IR';
+    boton.addEventListener('click', () => { window.location.href = 'auth.html'; });
+    return;
+  }
+
+  const { data: inscripcion } = await supabaseClient
+    .from('event_attendees')
+    .select('id')
+    .eq('event_id', eventId)
+    .eq('user_id', session.user.id)
+    .maybeSingle();
+
+  const actualizarBoton = (estaInscripto) => {
+    boton.textContent = estaInscripto ? 'CANCELAR INSCRIPCIÓN' : 'QUIERO IR';
+    boton.classList.toggle('btn-outline', estaInscripto);
+    boton.classList.toggle('btn-primary', !estaInscripto);
+    estado.hidden = true;
+  };
+
+  actualizarBoton(Boolean(inscripcion));
+  boton.addEventListener('click', async () => {
+    boton.disabled = true;
+    const estaInscripto = boton.textContent === 'CANCELAR INSCRIPCIÓN';
+    const resultado = estaInscripto
+      ? await supabaseClient.from('event_attendees').delete().eq('event_id', eventId).eq('user_id', session.user.id)
+      : await supabaseClient.from('event_attendees').insert({ event_id: eventId, user_id: session.user.id });
+
+    boton.disabled = false;
+    if (resultado.error) {
+      estado.textContent = 'No se pudo actualizar tu inscripción. Intentá nuevamente.';
+      estado.hidden = false;
+      return;
+    }
+    actualizarBoton(!estaInscripto);
+    estado.textContent = estaInscripto ? 'Cancelaste tu inscripción.' : '¡Listo! Ya estás inscripto.';
+    estado.hidden = false;
+  });
 }
 
 cargarProximoEvento();

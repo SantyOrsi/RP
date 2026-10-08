@@ -39,7 +39,8 @@ function renderDetalle(post, perfil) {
 
   detalle.innerHTML = `
     <div class="garage-detail-gallery">
-      <div class="garage-detail-main-image">
+      <div class="garage-detail-main-image" style="position:relative;">
+        ${post.is_featured ? '<span class="car-featured-badge" style="position:absolute;top:10px;left:10px;z-index:2;background:var(--accent, #00BFFF);color:#080A0D;font-family:\'Rajdhani\',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.05em;padding:3px 9px;border-radius:5px;">PUBLICIDAD</span>' : ''}
         <img id="garageDetailMainImage" src="${escapar(fotos[0])}" alt="${escapar(post.title)}" onerror="this.onerror=null;this.src='${fotoFallback}'">
       </div>
       ${fotos.length > 1 ? `<div class="garage-detail-thumbs" role="list">

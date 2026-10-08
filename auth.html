@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Iniciar sesión o unirte · RPM Rosario</title>
+<link rel="icon" href="assets/favicon.ico" sizes="48x48">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -46,6 +49,8 @@
           <span>Contraseña</span>
           <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
         </label>
+
+        <button type="button" class="auth-forgot" id="forgotLink">¿Olvidaste tu contraseña?</button>
 
         <p class="auth-message" id="loginMessage" hidden></p>
 
@@ -149,14 +154,15 @@
         </label>
         <div class="auth-phone-row">
           <label class="auth-field auth-phone-prefix">
-            <span>* Prefijo</span>
-            <input type="tel" name="prefijo" id="prefijoInput" required autocomplete="tel-area-code" placeholder="OBLIGATORIO" inputmode="numeric" pattern="[0-9]{2,5}" maxlength="5">
+            <span>* Código de área</span>
+            <input type="tel" name="prefijo" id="prefijoInput" required autocomplete="tel-area-code" placeholder="Ej: 341" inputmode="numeric" pattern="[0-9]{2,5}" maxlength="5" aria-describedby="telefonoAyuda">
           </label>
           <label class="auth-field">
-            <span>* Teléfono móvil <b>(Obligatorio)</b></span>
-            <input type="tel" name="telefono_movil" id="telefonoMovilInput" required autocomplete="tel-national" placeholder="Ej: 15 1234567" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10">
+            <span>* Nro. de teléfono <b>(Obligatorio)</b></span>
+            <input type="tel" name="telefono_movil" id="telefonoMovilInput" required autocomplete="tel-national" placeholder="54..." inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" aria-describedby="telefonoAyuda">
           </label>
         </div>
+        <small id="telefonoAyuda" class="auth-help">Código de área: 341. Celular: sin 0 y sin 15.</small>
         <label class="auth-field">
           <span>Contraseña</span>
           <input type="password" name="password" required autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8">
@@ -174,8 +180,37 @@
           <input type="text" id="registerWebsite" name="website" tabindex="-1" autocomplete="off">
         </div>
 
+        <label class="auth-field auth-checkbox-field">
+          <input type="checkbox" name="terms_accepted" id="termsCheckbox" required>
+          <span>Acepto los <a href="legales.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a> y la <a href="legales.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a></span>
+        </label>
+
         <button type="submit" class="btn btn-primary auth-submit">CREAR CUENTA</button>
         <p class="auth-fineprint">Al crear tu cuenta te vamos a enviar un mail para confirmarla.</p>
+      </form>
+    </section>
+
+    <!-- ===== OLVIDÉ MI CONTRASEÑA ===== -->
+    <section class="auth-panel" id="panel-forgot">
+      <h2 class="auth-title">Recuperar contraseña</h2>
+      <p class="auth-subtitle">Ingresá el email de tu cuenta y te enviamos un link para crear una contraseña nueva.</p>
+
+      <form id="forgotForm" class="auth-form" novalidate>
+        <label class="auth-field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="tu@email.com">
+        </label>
+
+        <p class="auth-message" id="forgotMessage" hidden></p>
+
+        <!-- Campo trampa anti-bot -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="forgotWebsite">No completar este campo</label>
+          <input type="text" id="forgotWebsite" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit">ENVIAR LINK</button>
+        <button type="button" class="auth-forgot auth-back" id="forgotBack">← Volver a iniciar sesión</button>
       </form>
     </section>
 
@@ -186,5 +221,6 @@
 <script src="js/supabase-client.js"></script>
 <script src="js/auth-debug.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/password-reset.js"></script>
 </body>
 </html>

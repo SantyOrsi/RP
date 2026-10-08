@@ -1,3 +1,5 @@
+.admin-event-price-row{ align-items:flex-start; }
+.admin-event-price-row .admin-check{ padding-top:12px; }
 /* admin.css — panel de eventos (usa las variables de styles.css y auth.css) */
 
 .admin-wrap{
@@ -33,12 +35,47 @@
   resize: vertical;
 }
 .auth-field textarea:focus{ outline:none; border-color: var(--accent); }
+.admin-file-help{ color:var(--text-dim); font-size:11.5px; margin-top:5px; }
+.admin-file-help.is-error{ color:#ff9b78; }
+.auth-field input[type="file"]{ padding:10px; cursor:pointer; }
 
 .admin-form-actions{ display:flex; gap:10px; margin-top:4px; }
 .admin-form-actions .auth-submit{ margin-top:0; }
 .admin-workshops-grid{ margin-top:22px; }
 .admin-check{ display:flex; flex-direction:row; align-items:center; gap:8px; }
 .admin-check input{ width:auto; }
+
+/* ----- Usuarios y estadisticas ----- */
+.admin-users-grid{ margin-bottom:22px; }
+.admin-catalog-card{ margin-bottom:22px; }
+.admin-catalog-form{ display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; align-items:end; }
+.admin-catalog-form .btn{ height:46px; }
+.admin-catalog-list{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+.admin-catalog-item{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:6px; padding:8px 10px; background:var(--bg); font-size:12px; }
+.admin-catalog-item small{ color:var(--text-dim); }
+.admin-catalog-delete{ border:0; background:none; color:#ff9b78; cursor:pointer; font-size:15px; padding:0 2px; }
+.admin-section-heading{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.admin-section-heading h2{ margin-bottom:0; }
+.admin-stats-layout{ display:flex; align-items:center; gap:24px; min-height:150px; }
+.admin-pie-chart{
+  width:150px; height:150px; flex:0 0 150px; border-radius:50%;
+  background: conic-gradient(var(--accent) 0deg 360deg);
+  position:relative;
+}
+.admin-pie-chart::after{ content:""; position:absolute; inset:34px; border-radius:50%; background:var(--bg-card); }
+.admin-chart-legend{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+.admin-legend-item{ display:flex; align-items:center; gap:8px; color:var(--text-dim); font-size:12.5px; }
+.admin-legend-swatch{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.admin-stats-summary{ margin-top:16px; color:var(--text-dim); font-size:13px; }
+.admin-users-list{ display:flex; flex-direction:column; gap:10px; max-height:330px; overflow:auto; }
+.admin-user-row{ border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--bg); }
+.admin-user-main{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.admin-user-email{ min-width:0; overflow-wrap:anywhere; font-size:13px; font-weight:600; }
+.admin-user-meta{ color:var(--text-dim); font-size:11.5px; margin-top:3px; }
+.admin-user-status{ color:var(--accent-bright); font-size:11px; white-space:nowrap; }
+.admin-user-status.is-banned{ color:#ff9b78; }
+.admin-ban-actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.admin-ban-btn{ padding:6px 9px; font-size:10px; letter-spacing:.04em; }
 
 /* ----- Lista de eventos ----- */
 .admin-events-list{ display:flex; flex-direction:column; gap:12px; }
@@ -55,6 +92,7 @@
 .admin-event-info{ flex:1; min-width:0; }
 .admin-event-info strong{ display:block; font-size:14px; font-weight:600; margin-bottom:3px; }
 .admin-event-info span{ display:block; color: var(--text-dim); font-size:12.5px; }
+.admin-event-info .admin-attendee-count{ color:var(--accent-bright); margin-top:4px; font-size:12px; }
 .admin-event-actions{ display:flex; gap:8px; flex-shrink:0; }
 .admin-icon-btn{
   width:32px; height:32px; border-radius:6px; border:1px solid var(--border); background:transparent;
@@ -69,4 +107,6 @@
 @media (max-width: 760px){
   .admin-grid{ grid-template-columns: 1fr; }
   .admin-form-row{ grid-template-columns: 1fr; }
+  .admin-catalog-form{ grid-template-columns:1fr; }
+  .admin-stats-layout{ justify-content:center; }
 }

@@ -111,7 +111,8 @@ async function configurarWidgetCalificar(sessionUserId, perfilUserId) {
 
       calificarMessage.hidden = false;
       if (error) {
-        calificarMessage.textContent = 'No se pudo guardar tu calificación.';
+        console.error('Error guardando calificación:', error);
+        calificarMessage.textContent = `No se pudo guardar tu calificación: ${error.message || 'revisá la consola'}`;
         calificarMessage.classList.remove('is-success');
       } else {
         calificarMessage.textContent = '¡Gracias por calificar!';

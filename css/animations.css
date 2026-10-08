@@ -1,0 +1,313 @@
+/* ==========================================================================
+   RPM Rosario — animaciones
+   Se carga DESPUÉS de styles.css y chat.css. Solo agrega reglas: no hay que
+   tocar nada de lo existente. Todo respeta prefers-reduced-motion.
+
+   Piezas:
+   1. Revelado al hacer scroll   ([data-reveal] y [data-reveal-group])
+   2. Entrada del hero
+   3. Header (sombra al scrollear, barra de progreso, menú activo, logo)
+   4. Botones
+   5. Tarjetas (features, garage, magazine, foro)
+   6. Skeletons de carga (foro / evento)
+   7. Newsletter y footer
+   8. Menú mobile
+   9. Reduced motion
+   ========================================================================== */
+
+:root{
+  --ease-out: cubic-bezier(.2, .75, .25, 1);
+  --ease-racing: cubic-bezier(.7, 0, .2, 1);
+}
+
+/* ==========================================================================
+   1. REVELADO AL HACER SCROLL
+   Solo se oculta si JS está activo (clase .js en <html>). Si animations.js no
+   carga, index.html quita esa clase y todo se ve normal.
+   ========================================================================== */
+@keyframes rv-up{
+  from{ opacity:0; translate:0 28px; }
+  to{ opacity:1; translate:0 0; }
+}
+@keyframes rv-zoom{
+  from{ opacity:0; scale:.95; translate:0 20px; }
+  to{ opacity:1; scale:1; translate:0 0; }
+}
+
+.js [data-reveal],
+.js [data-reveal-group] > *{
+  opacity:0;
+}
+
+/* animation-fill-mode: backwards => al terminar, el elemento vuelve a su
+   estilo normal y los :hover (transform / translate) siguen funcionando. */
+.js [data-reveal].is-visible,
+.js [data-reveal-group] > .is-visible{
+  opacity:1;
+  animation: rv-up .8s var(--ease-out) var(--d, 0ms) backwards;
+}
+.js [data-reveal="zoom"].is-visible{
+  animation-name: rv-zoom;
+}
+
+/* Si una tarjeta del garage es "destacada" por link (.is-target), se mantiene
+   su animación de resaltado además de la de entrada. */
+.js [data-reveal-group] > .car-card.is-target.is-visible{
+  animation: rv-up .8s var(--ease-out) var(--d, 0ms) backwards,
+             garage-target 1.8s ease-out;
+}
+
+/* La rayita de los títulos "crece" al aparecer */
+.js [data-reveal] .dash{
+  width:0;
+  transition: width .7s var(--ease-out) .3s;
+}
+.js [data-reveal].is-visible .dash{ width:36px; }
+
+/* ==========================================================================
+   2. ENTRADA DEL HERO
+   ========================================================================== */
+/* Imagen más alta que el hero para que el parallax (JS) no deje huecos */
+.hero-img{
+  position:absolute; left:0; top:-12%;
+  width:100%; height:112%;
+  translate: 0 var(--py, 0px);
+  transform-origin: 62% 40%;
+  animation: hero-settle 14s var(--ease-out) both;
+}
+@keyframes hero-settle{
+  0%  { scale:1.16; opacity:0; }
+  8%  { opacity:.55; }
+  100%{ scale:1;    opacity:.55; }
+}
+
+/* Las 3 rayitas "disparan" de izquierda a derecha */
+.hero-lines span{
+  transform-origin: left center;
+  animation: line-in .7s var(--ease-racing) backwards;
+}
+.hero-lines span:nth-child(1){ animation-delay:.2s; }
+.hero-lines span:nth-child(2){ animation-delay:.34s; }
+.hero-lines span:nth-child(3){ animation-delay:.48s; }
+@keyframes line-in{
+  from{ opacity:0; transform:scaleX(0); }
+}
+
+/* RPM entra rápido desde la izquierda y después respira con el glow */
+.hero-title{
+  animation:
+    title-in 1s var(--ease-out) .25s backwards,
+    title-glow 4.5s ease-in-out 1.4s infinite alternate;
+}
+@keyframes title-in{
+  from{ opacity:0; transform: translateX(-60px) skewX(-8deg); filter: blur(10px); }
+  to{   opacity:1; transform: none; filter: none; }
+}
+@keyframes title-glow{
+  from{ text-shadow: 0 0 46px rgba(0,191,255,.35); }
+  to{   text-shadow: 0 0 72px rgba(0,191,255,.65), 0 0 18px rgba(0,191,255,.25); }
+}
+
+/* ROSARIO abre el espaciado de letras */
+.hero-title-sub{
+  animation: sub-in 1.1s var(--ease-out) .75s backwards;
+}
+@keyframes sub-in{
+  from{ opacity:0; letter-spacing:.9em; }
+}
+
+.hero-headline{ animation: rv-up .9s var(--ease-out) .6s  backwards; }
+.hero-text{     animation: rv-up .9s var(--ease-out) .75s backwards; }
+.hero-ctas{     animation: rv-up .9s var(--ease-out) .9s  backwards; }
+
+/* Pulso suave en el botón principal */
+.hero-ctas .btn-primary{
+  animation: cta-pulse 2.8s ease-out 2.4s infinite;
+}
+@keyframes cta-pulse{
+  0%{       box-shadow: 0 0 0 0 rgba(0,191,255,.5); }
+  70%, 100%{ box-shadow: 0 0 0 16px rgba(0,191,255,0); }
+}
+
+/* ==========================================================================
+   3. HEADER
+   ========================================================================== */
+.site-header{
+  animation: header-in .7s var(--ease-out) backwards;
+  transition: background .3s ease, box-shadow .3s ease;
+}
+@keyframes header-in{
+  from{ opacity:0; translate:0 -100%; }
+  to{   opacity:1; translate:0 0; }
+}
+.site-header.is-scrolled{
+  background: rgba(8,10,13,.94);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.header-inner{ transition: height .3s var(--ease-out); }
+.site-header.is-scrolled .header-inner{ height:64px; }
+
+/* Barra de progreso de lectura (la actualiza JS con --p de 0 a 1) */
+.scroll-progress{
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  box-shadow: 0 0 10px rgba(0,191,255,.7);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Subrayado animado en el menú + sección activa */
+.main-nav a::after{
+  content:''; position:absolute; left:0; right:0; bottom:-8px; height:2px;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform .3s var(--ease-out);
+}
+.main-nav a:hover::after,
+.main-nav a.is-active::after{ transform: scaleX(1); }
+.main-nav a.is-active{ color: var(--text); }
+
+/* Las rayitas del logo "aceleran" al pasar el mouse */
+.logo-mark path{ transition: transform .35s var(--ease-out); }
+.logo:hover .logo-mark path:nth-child(1){ transform: translateX(-7px); }
+.logo:hover .logo-mark path:nth-child(2){ transform: translateX(-4px); }
+.logo:hover .logo-mark path:nth-child(3){ transform: translateX(-2px); }
+
+/* ==========================================================================
+   4. BOTONES
+   ========================================================================== */
+.btn{ position:relative; overflow:hidden; }
+.btn > span[aria-hidden="true"]{ transition: transform .25s var(--ease-out); }
+.btn:hover > span[aria-hidden="true"]{ transform: translateX(4px); }
+
+/* Brillo que cruza el botón principal */
+.btn-primary::after{
+  content:''; position:absolute; top:0; bottom:0; left:-70%;
+  width:50%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+  transform: skewX(-20deg);
+  transition: left .7s var(--ease-out);
+  pointer-events:none;
+}
+.btn-primary:hover::after{ left:130%; }
+.btn-outline:hover{ background: rgba(0,191,255,.08); }
+
+/* ==========================================================================
+   5. TARJETAS
+   ========================================================================== */
+/* Features: línea que barre arriba + luz que sigue al mouse + ícono que salta */
+.feature-card{ position:relative; }
+.feature-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform .4s var(--ease-out);
+}
+.feature-card:hover::before{ transform: scaleX(1); }
+.feature-card:hover{
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 30%),
+              rgba(0,191,255,.10), rgba(0,191,255,.03) 70%);
+}
+.feature-icon{
+  transition: transform .35s var(--ease-out), background .3s ease, box-shadow .3s ease;
+}
+.feature-card:hover .feature-icon{
+  transform: translateY(-4px) rotate(-6deg);
+  background: rgba(0,191,255,.18);
+  box-shadow: 0 10px 26px rgba(0,191,255,.22);
+}
+
+/* Garage y Magazine: zoom suave en la foto + sombra al levantar */
+.car-card,
+.mag-card{
+  transition: border-color .2s ease, transform .3s var(--ease-out), box-shadow .3s ease;
+}
+.car-card:hover,
+.mag-card:hover{
+  box-shadow: 0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,191,255,.2);
+}
+.car-img img,
+.mag-img img{ transition: transform .7s var(--ease-out); }
+.car-card:hover .car-img img,
+.mag-card:hover .mag-img img{ transform: scale(1.06); }
+.mag-badge{ transition: background .25s ease, color .25s ease; }
+.mag-card:hover .mag-badge{ background: var(--accent); color:#04121a; }
+
+/* Foro: la fila se corre un poquito al pasar el mouse */
+.forum-row{ transition: background .2s ease, translate .25s var(--ease-out); }
+a.forum-row:hover{ translate: 4px 0; }
+
+/* ==========================================================================
+   6. SKELETONS DE CARGA (el contenido llega de Supabase)
+   ========================================================================== */
+.forum-row--loading{ position:relative; overflow:hidden; }
+.forum-row--loading[aria-hidden="true"]{ min-height:68px; }
+.forum-row--loading::after{
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(100deg, transparent 20%, rgba(0,191,255,.08) 50%, transparent 80%);
+  translate: -100% 0;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer{ to{ translate: 100% 0; } }
+
+.event-loading{ animation: dim-pulse 1.6s ease-in-out infinite; }
+.magazine-status{ animation: dim-pulse 1.6s ease-in-out infinite; }
+@keyframes dim-pulse{ 50%{ opacity:.45; } }
+
+/* ==========================================================================
+   7. NEWSLETTER Y FOOTER
+   ========================================================================== */
+/* El resplandor del fondo se mueve despacio */
+.newsletter-inner::before{
+  inset:-60px;
+  animation: glow-drift 9s ease-in-out infinite alternate;
+}
+@keyframes glow-drift{
+  from{ opacity:.55; translate: 0 0; }
+  to{   opacity:1;   translate: -50px 24px; }
+}
+.newsletter-form input{ transition: border-color .2s ease, box-shadow .25s ease; }
+.newsletter-form input:focus{ box-shadow: 0 0 0 3px rgba(0,191,255,.18); }
+
+.social-links a{ transition: border-color .2s ease, color .2s ease, transform .25s var(--ease-out); }
+.social-links a:hover{ transform: translateY(-3px); }
+.footer-col a{ transition: color .2s ease, translate .25s var(--ease-out); }
+.footer-col a:hover{ translate: 4px 0; }
+
+/* ==========================================================================
+   8. MENÚ MOBILE: los links entran uno por uno
+   ========================================================================== */
+@keyframes drawer-in{
+  from{ opacity:0; translate:-18px 0; }
+  to{   opacity:1; translate:0 0; }
+}
+.mobile-drawer.is-open > a,
+.mobile-drawer.is-open .mobile-drawer-actions{
+  animation: drawer-in .45s var(--ease-out) backwards;
+}
+.mobile-drawer.is-open > a:nth-child(1){ animation-delay:.04s; }
+.mobile-drawer.is-open > a:nth-child(2){ animation-delay:.08s; }
+.mobile-drawer.is-open > a:nth-child(3){ animation-delay:.12s; }
+.mobile-drawer.is-open > a:nth-child(4){ animation-delay:.16s; }
+.mobile-drawer.is-open > a:nth-child(5){ animation-delay:.2s; }
+.mobile-drawer.is-open > a:nth-child(6){ animation-delay:.24s; }
+.mobile-drawer.is-open .mobile-drawer-actions{ animation-delay:.3s; }
+
+/* ==========================================================================
+   9. REDUCED MOTION
+   styles.css ya acorta duraciones; acá se anulan demoras y repeticiones
+   para que nada quede esperando ni parpadee en loop.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+  .js [data-reveal],
+  .js [data-reveal-group] > *{ opacity:1 !important; }
+  .hero-img{ translate:none !important; }
+}

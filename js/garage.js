@@ -7,6 +7,9 @@ const cerrarModalGarage = document.getElementById('cerrarModalGarage');
 const formPublicarAuto = document.getElementById('formPublicarAuto');
 const garageMarcaInput = document.getElementById('garageMarcaInput');
 const garageTituloInput = document.getElementById('garageTituloInput');
+const garageTipoSelect = document.getElementById('garageTipoSelect');
+const garageModeloManualInput = document.getElementById('garageModeloManualInput');
+const garageModeloManualLabel = document.getElementById('garageModeloManualLabel');
 const garageAnioInput = document.getElementById('garageAnioInput');
 const garageEstadoSelect = document.getElementById('garageEstadoSelect');
 const garageKmInput = document.getElementById('garageKmInput');
@@ -57,6 +60,52 @@ let nombresCache = {};
 let tiposUsuarioCache = {};
 let usuarioActualId = null;
 let publicacionEnEdicion = null;
+let catalogoMarcas = [];
+let catalogoModelos = [];
+let catalogoTipos = [];
+
+async function cargarCatalogoVehiculos() {
+  if (!garageTipoSelect) return;
+  const [{ data: tipos }, { data: marcas }, { data: modelos }] = await Promise.all([
+    supabaseClient.from('vehicle_types').select('id, name, slug').order('name'),
+    supabaseClient.from('vehicle_brands').select('id, name, slug, vehicle_type_id').order('name'),
+    supabaseClient.from('vehicle_models').select('id, name, brand_id').order('name')
+  ]);
+  if (!tipos?.length || !marcas?.length || !modelos?.length) return;
+  catalogoTipos = tipos;
+  catalogoMarcas = marcas;
+  catalogoModelos = modelos;
+  garageTipoSelect.innerHTML = '<option value="">Seleccioná un tipo...</option>' + tipos.map(tipo => `<option value="${tipo.id}">${tipo.name}</option>`).join('');
+  garageTipoSelect.addEventListener('change', actualizarMarcasCatalogo);
+  garageMarcaInput.addEventListener('change', actualizarModelosCatalogo);
+}
+
+function actualizarMarcasCatalogo() {
+  const marcas = catalogoMarcas.filter(marca => marca.vehicle_type_id === garageTipoSelect.value);
+  garageMarcaInput.disabled = !marcas.length;
+  garageMarcaInput.innerHTML = '<option value="">Seleccioná una marca...</option>' + marcas.map(marca => `<option value="${marca.id}">${marca.name}</option>`).join('');
+  garageTituloInput.disabled = true;
+  garageTituloInput.innerHTML = '<option value="">Seleccioná primero la marca...</option>';
+}
+
+function actualizarModelosCatalogo() {
+  const modelos = catalogoModelos.filter(modelo => modelo.brand_id === garageMarcaInput.value);
+  garageTituloInput.disabled = !garageMarcaInput.value;
+  garageTituloInput.innerHTML = '<option value="">Seleccioná un modelo...</option>' + modelos.map(modelo => `<option value="${modelo.id}">${modelo.name}</option>`).join('') + '<option value="__manual__">Otro modelo...</option>';
+  garageModeloManualInput.hidden = true;
+  garageModeloManualLabel.hidden = true;
+  garageModeloManualInput.required = false;
+}
+
+garageTituloInput.addEventListener('change', () => {
+  const manual = garageTituloInput.value === '__manual__';
+  garageModeloManualInput.hidden = !manual;
+  garageModeloManualLabel.hidden = !manual;
+  garageModeloManualInput.required = manual;
+  if (!manual) garageModeloManualInput.value = '';
+});
+
+cargarCatalogoVehiculos();
 
 // Convierte la imagen elegida a base64 en formato webp, redimensionada
 // para no guardar archivos gigantes en la base (mismo criterio que el avatar).
@@ -155,7 +204,8 @@ function tarjetaAuto(post) {
 
   return `
     <article class="car-card" id="auto-${post.id}" data-post-id="${post.id}" tabindex="0" role="link" aria-label="Ver publicación de ${post.brand ? post.brand + ' ' : ''}${post.title}">
-      <div class="car-img" data-indice="0">
+      <div class="car-img" data-indice="0" style="position:relative;">
+        ${post.is_featured ? '<span class="car-featured-badge" style="position:absolute;top:10px;left:10px;z-index:2;background:var(--accent, #00BFFF);color:#080A0D;font-family:\'Rajdhani\',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.05em;padding:3px 9px;border-radius:5px;">PUBLICIDAD</span>' : ''}
         ${fotos.map((foto, i) => `<img src="${foto}" alt="${post.title}" loading="lazy" class="${i === 0 ? 'is-active' : ''}">`).join('') || `<img src="${fotoDefault}" alt="${post.title}" loading="lazy" class="is-active">`}
         ${fotos.length > 1 ? `
           <button type="button" class="car-img-nav car-img-prev" aria-label="Foto anterior">&#8249;</button>
@@ -309,6 +359,7 @@ async function cargarPublicacionesGarage() {
   const { data: posts, error } = await supabaseClient
     .from('garage_posts')
     .select('*')
+    .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (error || !posts) {
@@ -360,6 +411,15 @@ async function cargarTalleres() {
 function prepararModalPublicacion() {
   publicacionEnEdicion = null;
   formPublicarAuto.reset();
+  garageTipoSelect.value = '';
+  garageMarcaInput.disabled = true;
+  garageTituloInput.disabled = true;
+  garageMarcaInput.innerHTML = '<option value="">Seleccioná primero el tipo...</option>';
+  garageTituloInput.innerHTML = '<option value="">Seleccioná primero la marca...</option>';
+  garageModeloManualInput.hidden = true;
+  garageModeloManualLabel.hidden = true;
+  garageModeloManualInput.required = false;
+  garageModeloManualInput.value = '';
   imagenesBase64 = [];
   garageFotosPreview.innerHTML = '';
   garageFormMessage.hidden = true;
@@ -378,8 +438,14 @@ function abrirModalEdicion(post) {
   garageCupoTexto.hidden = true;
   garageFormMessage.hidden = true;
 
-  garageMarcaInput.value = post.brand || '';
-  garageTituloInput.value = post.title || '';
+  if (post.vehicle_type && post.model_id) {
+    const tipo = catalogoTipos.find(item => item.slug === post.vehicle_type);
+    garageTipoSelect.value = tipo?.id || '';
+    actualizarMarcasCatalogo();
+    garageMarcaInput.value = catalogoMarcas.find(marca => marca.id === post.brand_id)?.id || '';
+    actualizarModelosCatalogo();
+    garageTituloInput.value = post.model_id;
+  }
   garageAnioInput.value = post.anio || '';
   garageEstadoSelect.value = post.es_usado === false ? '0km' : 'usado';
   garageEstadoSelect.dispatchEvent(new Event('change'));
@@ -515,9 +581,22 @@ if (formPublicarAuto) {
 
     const esUsado = garageEstadoSelect.value === 'usado';
 
+    const tipoSeleccionado = catalogoTipos.find(tipo => tipo.id === garageTipoSelect.value);
+    const marcaSeleccionada = catalogoMarcas.find(marca => marca.id === garageMarcaInput.value);
+    const modeloSeleccionado = catalogoModelos.find(modelo => modelo.id === garageTituloInput.value);
+    const modeloManual = garageTituloInput.value === '__manual__' ? garageModeloManualInput.value.trim() : '';
+    if (!tipoSeleccionado || !marcaSeleccionada || (!modeloSeleccionado && !modeloManual)) {
+      garageFormMessage.textContent = 'Seleccioná tipo y marca, y elegí o escribí un modelo.';
+      garageFormMessage.hidden = false;
+      return;
+    }
+
     const datosAuto = {
-      brand: garageMarcaInput.value,
-      title: garageTituloInput.value,
+      vehicle_type: tipoSeleccionado.slug,
+      brand: marcaSeleccionada.name,
+      brand_id: marcaSeleccionada.id,
+      model_id: modeloSeleccionado?.id || null,
+      title: modeloSeleccionado?.name || modeloManual,
       anio: garageAnioInput.value ? Number(garageAnioInput.value) : null,
       es_usado: esUsado,
       kilometraje: esUsado && garageKmInput.value ? Number(garageKmInput.value) : null,
