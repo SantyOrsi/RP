@@ -25,6 +25,8 @@ const garageFormMessage = document.getElementById('garageFormMessage');
 const garageCupoTexto = document.getElementById('garageCupoTexto');
 const garageModalTitulo = document.getElementById('garageModalTitulo');
 const garageFormSubmit = document.getElementById('garageFormSubmit');
+const garageCamaraInput = document.getElementById('garageCamaraInput');
+const garageFotosEstado = document.getElementById('garageFotosEstado');
 
 // Estos solo existen en garage.html (el index solo muestra destacados)
 const garageFiltroMarca = document.getElementById('garageFiltroMarca');
@@ -107,32 +109,47 @@ garageTituloInput.addEventListener('change', () => {
 
 cargarCatalogoVehiculos();
 
-// Convierte la imagen elegida a base64 en formato webp, redimensionada
-// para no guardar archivos gigantes en la base (mismo criterio que el avatar).
-function leerImagenComoWebp(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const lector = new FileReader();
+// Convierte la imagen elegida a base64, redimensionada para no guardar archivos
+// gigantes en la base (mismo criterio que el avatar). Usa webp y, si el navegador
+// no sabe generarlo (Safari en iPhone), cae a jpeg. Las fotos del celular pesan
+// varios MB, por eso se leen sin pasar por FileReader (gasta mucha menos memoria).
+async function cargarImagenParaCanvas(file) {
+  if (window.createImageBitmap) {
+    try {
+      const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      return { fuente: bitmap, ancho: bitmap.width, alto: bitmap.height, liberar: () => bitmap.close && bitmap.close() };
+    } catch (_) { /* sigue con el método clásico */ }
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('No se pudo leer la imagen'));
+      el.src = url;
+    });
+    return { fuente: img, ancho: img.naturalWidth, alto: img.naturalHeight, liberar: () => URL.revokeObjectURL(url) };
+  } catch (err) {
+    URL.revokeObjectURL(url);
+    throw err;
+  }
+}
 
-    lector.onload = () => {
-      img.onload = () => {
-        const maxAncho = 900;
-        const escala = Math.min(1, maxAncho / img.width);
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width * escala;
-        canvas.height = img.height * escala;
+async function leerImagenComoWebp(file) {
+  const imagen = await cargarImagenParaCanvas(file);
+  try {
+    const maxAncho = 900;
+    const escala = Math.min(1, maxAncho / imagen.ancho);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(imagen.ancho * escala));
+    canvas.height = Math.max(1, Math.round(imagen.alto * escala));
+    canvas.getContext('2d').drawImage(imagen.fuente, 0, 0, canvas.width, canvas.height);
 
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        resolve(canvas.toDataURL('image/webp', 0.85));
-      };
-      img.onerror = reject;
-      img.src = lector.result;
-    };
-    lector.onerror = reject;
-    lector.readAsDataURL(file);
-  });
+    const webp = canvas.toDataURL('image/webp', 0.85);
+    return webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.82);
+  } finally {
+    imagen.liberar();
+  }
 }
 
 // Trae el nombre a mostrar de cada usuario (public_profiles es la vista pública, sin datos sensibles)
@@ -421,10 +438,13 @@ function prepararModalPublicacion() {
   garageModeloManualInput.required = false;
   garageModeloManualInput.value = '';
   imagenesBase64 = [];
+  fotosPendientes = 0;
+  publicando = false;
   garageFotosPreview.innerHTML = '';
+  mostrarEstadoFotos('');
   garageFormMessage.hidden = true;
   garageModalTitulo.textContent = 'PUBLICAR TU AUTO';
-  garageFormSubmit.textContent = 'PUBLICAR';
+  actualizarBotonPublicar();
   garageCupoTexto.hidden = false;
   garageKmInput.style.display = 'none';
   garageKmLabel.style.display = 'none';
@@ -434,7 +454,10 @@ function prepararModalPublicacion() {
 function abrirModalEdicion(post) {
   publicacionEnEdicion = post;
   garageModalTitulo.textContent = 'EDITAR PUBLICACIÓN';
-  garageFormSubmit.textContent = 'GUARDAR CAMBIOS';
+  fotosPendientes = 0;
+  publicando = false;
+  mostrarEstadoFotos('');
+  actualizarBotonPublicar();
   garageCupoTexto.hidden = true;
   garageFormMessage.hidden = true;
 
@@ -514,70 +537,126 @@ if (publicarAutoBtn) {
 }
 
 const MAX_FOTOS = 5;
+let fotosPendientes = 0;   // fotos que se están procesando ahora mismo
+let publicando = false;
+
+function mostrarEstadoFotos(texto, tipo) {
+  if (!garageFotosEstado) return;
+  garageFotosEstado.textContent = texto || '';
+  garageFotosEstado.classList.toggle('is-ok', tipo === 'ok');
+  garageFotosEstado.classList.toggle('is-error', tipo === 'error');
+  garageFotosEstado.hidden = !texto;
+}
+
+// El botón de publicar queda bloqueado mientras se procesan fotos o se guarda la publicación
+function actualizarBotonPublicar() {
+  if (!garageFormSubmit) return;
+  const textoNormal = publicacionEnEdicion ? 'GUARDAR CAMBIOS' : 'PUBLICAR';
+  garageFormSubmit.disabled = publicando || fotosPendientes > 0;
+  garageFormSubmit.classList.toggle('is-loading', publicando);
+  garageFormSubmit.textContent = publicando
+    ? (publicacionEnEdicion ? 'GUARDANDO…' : 'PUBLICANDO…')
+    : (fotosPendientes > 0 ? 'PROCESANDO FOTOS…' : textoNormal);
+}
 
 function renderizarPreviewFotos() {
   if (!garageFotosPreview) return;
-  garageFotosPreview.innerHTML = imagenesBase64.map((img, i) => `
-    <div class="garage-foto-mini">
+  const listas = imagenesBase64.map((img, i) => `
+    <div class="garage-foto-mini is-lista">
       <img src="${img}" alt="Foto ${i + 1}">
-      <button type="button" class="garage-foto-mini-quitar" data-index="${i}">&times;</button>
+      <span class="garage-foto-ok" aria-hidden="true">&#10003;</span>
+      <button type="button" class="garage-foto-mini-quitar" data-index="${i}" aria-label="Quitar foto ${i + 1}">&times;</button>
     </div>
   `).join('');
+  const cargando = Array.from({ length: fotosPendientes }, () =>
+    '<div class="garage-foto-mini is-cargando" aria-hidden="true"><span class="garage-spinner"></span></div>'
+  ).join('');
+  garageFotosPreview.innerHTML = listas + cargando;
 
   garageFotosPreview.querySelectorAll('.garage-foto-mini-quitar').forEach(btn => {
     btn.addEventListener('click', () => {
       imagenesBase64.splice(Number(btn.dataset.index), 1);
+      mostrarEstadoFotos('');
       renderizarPreviewFotos();
     });
   });
 }
 
-if (garageImagenInput) {
-  garageImagenInput.addEventListener('change', async () => {
-    const archivos = Array.from(garageImagenInput.files);
-    garageImagenInput.value = ''; // permite volver a elegir el mismo archivo después
+async function procesarArchivosElegidos(archivos) {
+  const lugar = MAX_FOTOS - imagenesBase64.length;
+  const aProcesar = archivos.filter(f => !f.type || f.type.startsWith('image/')).slice(0, Math.max(lugar, 0));
+  const sobrantes = archivos.length - aProcesar.length;
 
-    for (const file of archivos) {
-      if (imagenesBase64.length >= MAX_FOTOS) {
-        alert(`Máximo ${MAX_FOTOS} fotos por publicación.`);
-        break;
-      }
-      try {
-        const resultado = await leerImagenComoWebp(file);
+  if (!aProcesar.length) {
+    mostrarEstadoFotos(lugar <= 0 ? `Ya tenés ${MAX_FOTOS} fotos. Quitá alguna para agregar otra.` : 'Ese archivo no es una imagen.', 'error');
+    return;
+  }
 
-        if (!resultado.startsWith('data:image/webp')) {
-          alert('Tu navegador no puede convertir la imagen a webP. Probá con Chrome, Firefox o Edge actualizado.');
-          continue;
-        }
+  fotosPendientes = aProcesar.length;
+  actualizarBotonPublicar();
+  renderizarPreviewFotos();
 
-        imagenesBase64.push(resultado);
-      } catch (err) {
-        console.error('Error procesando la imagen:', err);
-      }
+  let fallidas = 0;
+  for (let i = 0; i < aProcesar.length; i++) {
+    mostrarEstadoFotos(`Procesando foto ${i + 1} de ${aProcesar.length}…`);
+    try {
+      imagenesBase64.push(await leerImagenComoWebp(aProcesar[i]));
+    } catch (err) {
+      fallidas++;
+      console.error('Error procesando la imagen:', err);
     }
-
+    fotosPendientes--;
     renderizarPreviewFotos();
-  });
+  }
+
+  fotosPendientes = 0;
+  actualizarBotonPublicar();
+  renderizarPreviewFotos();
+
+  const ok = aProcesar.length - fallidas;
+  const avisos = [];
+  if (fallidas) avisos.push(`${fallidas} no se pudo${fallidas === 1 ? '' : 'ieron'} leer`);
+  if (sobrantes > 0) avisos.push(`el máximo es ${MAX_FOTOS} fotos`);
+  mostrarEstadoFotos(
+    `${ok ? `✓ ${ok} foto${ok === 1 ? '' : 's'} lista${ok === 1 ? '' : 's'}` : 'No se pudo cargar ninguna foto'}${avisos.length ? ' · ' + avisos.join(' · ') : ''}`,
+    fallidas || !ok ? 'error' : 'ok'
+  );
 }
+
+[garageImagenInput, garageCamaraInput].forEach(input => {
+  if (!input) return;
+  input.addEventListener('change', () => {
+    const archivos = Array.from(input.files || []);
+    input.value = ''; // permite volver a elegir el mismo archivo después
+    if (archivos.length) procesarArchivosElegidos(archivos);
+  });
+});
 
 if (formPublicarAuto) {
   formPublicarAuto.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (publicando || fotosPendientes > 0) return;
+
+    // Se bloquea ya mismo para que un doble toque no publique dos veces
+    publicando = true;
+    actualizarBotonPublicar();
+    const cancelar = (texto) => {
+      publicando = false;
+      actualizarBotonPublicar();
+      mostrarMensajeGarage(texto, 'error');
+    };
 
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session || !session.user) {
+      publicando = false;
+      actualizarBotonPublicar();
       alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
       window.location.href = 'auth.html';
       return;
     }
 
     const telefonoRegistrado = await obtenerTelefonoRegistrado(session);
-    if (!telefonoRegistrado) {
-      garageFormMessage.textContent = 'Tu cuenta no tiene un teléfono registrado.';
-      garageFormMessage.classList.remove('is-success');
-      garageFormMessage.hidden = false;
-      return;
-    }
+    if (!telefonoRegistrado) return cancelar('Tu cuenta no tiene un teléfono registrado.');
 
     const esUsado = garageEstadoSelect.value === 'usado';
 
@@ -586,9 +665,7 @@ if (formPublicarAuto) {
     const modeloSeleccionado = catalogoModelos.find(modelo => modelo.id === garageTituloInput.value);
     const modeloManual = garageTituloInput.value === '__manual__' ? garageModeloManualInput.value.trim() : '';
     if (!tipoSeleccionado || !marcaSeleccionada || (!modeloSeleccionado && !modeloManual)) {
-      garageFormMessage.textContent = 'Seleccioná tipo y marca, y elegí o escribí un modelo.';
-      garageFormMessage.hidden = false;
-      return;
+      return cancelar('Seleccioná tipo y marca, y elegí o escribí un modelo.');
     }
 
     const datosAuto = {
@@ -610,28 +687,54 @@ if (formPublicarAuto) {
       images: imagenesBase64.length ? imagenesBase64 : null
     };
 
-    const consulta = publicacionEnEdicion
-      ? supabaseClient.from('garage_posts').update(datosAuto).eq('id', publicacionEnEdicion.id).eq('created_by', session.user.id)
-      : supabaseClient.from('garage_posts').insert([{ ...datosAuto, created_by: session.user.id }]);
-    const { error } = await consulta;
+    mostrarMensajeGarage(imagenesBase64.length
+      ? `Guardando tu publicación con ${imagenesBase64.length} foto${imagenesBase64.length === 1 ? '' : 's'}… No cierres esta pantalla.`
+      : 'Guardando tu publicación…', 'info');
 
-    if (error) {
-      garageFormMessage.textContent = error.message.includes('límite')
-        ? error.message
-        : 'Error al publicar tu auto.';
-      garageFormMessage.classList.remove('is-success');
-    } else {
-      garageFormMessage.textContent = publicacionEnEdicion ? '¡Cambios guardados!' : '¡Tu auto ya está publicado!';
-      garageFormMessage.classList.add('is-success');
-
-      setTimeout(() => {
-        modalPublicarAuto.hidden = true;
-        cargarPublicacionesGarage();
-      }, 1200);
+    let error = null;
+    try {
+      const consulta = publicacionEnEdicion
+        ? supabaseClient.from('garage_posts').update(datosAuto).eq('id', publicacionEnEdicion.id).eq('created_by', session.user.id)
+        : supabaseClient.from('garage_posts').insert([{ ...datosAuto, created_by: session.user.id }]);
+      ({ error } = await consulta);
+    } catch (err) {
+      error = err || new Error('red');
     }
 
-    garageFormMessage.hidden = false;
+    if (error) {
+      console.error('Error guardando la publicación:', error);
+      publicando = false;
+      actualizarBotonPublicar();
+      mostrarMensajeGarage(
+        (error.message || '').includes('límite')
+          ? error.message
+          : 'No se pudo guardar. Revisá tu conexión y probá de nuevo: tus datos y fotos siguen cargados.',
+        'error'
+      );
+      return;
+    }
+
+    // Queda bloqueado (no se puede volver a enviar) hasta que se cierra el modal
+    garageFormSubmit.classList.remove('is-loading');
+    garageFormSubmit.textContent = '✓ LISTO';
+    mostrarMensajeGarage(publicacionEnEdicion ? '¡Cambios guardados!' : '¡Tu auto ya está publicado!', 'ok');
+
+    setTimeout(() => {
+      modalPublicarAuto.hidden = true;
+      publicando = false;
+      cargarPublicacionesGarage();
+    }, 1800);
   });
+}
+
+// El mensaje queda abajo de todo el formulario: en el celular hay que llevarlo a la vista
+function mostrarMensajeGarage(texto, tipo) {
+  garageFormMessage.textContent = texto;
+  garageFormMessage.classList.toggle('is-success', tipo === 'ok');
+  garageFormMessage.classList.toggle('is-error', tipo === 'error');
+  garageFormMessage.classList.toggle('is-info', tipo === 'info');
+  garageFormMessage.hidden = false;
+  garageFormMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 if (cerrarModalGarage) {

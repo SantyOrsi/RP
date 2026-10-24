@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<script>document.documentElement.classList.add('js');</script>
+<title>Mi concesionaria · RPM Rosario</title>
+<link rel="icon" href="assets/favicon.ico" sizes="48x48">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/panel-concesionaria.css">
+</head>
+<body>
+
+<!-- ===== HEADER (igual al del index) ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <div class="header-inner">
+    <a href="index.html" class="logo" aria-label="RPM Rosario - Inicio">
+      <svg class="logo-mark" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g>
+          <path d="M0 30 L28 27 L0 24" fill="var(--accent)"/>
+          <path d="M8 34 L32 30.5 L8 27" fill="var(--accent)" opacity="0.6"/>
+          <path d="M16 38 L36 34 L16 30" fill="var(--accent)" opacity="0.35"/>
+        </g>
+        <text x="34" y="42" class="logo-text-rpm">RPM</text>
+      </svg>
+      <span class="logo-sub">ROSARIO</span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html#garage">GARAGE</a>
+      <a href="index.html#comunidad">COMUNIDAD</a>
+      <a href="index.html#eventos">EVENTOS</a>
+      <a href="https://wa.me/5493417046870?text=Hola,%20quiero%20asesoramiento%20sobre%20mi%20auto%20en%20RPM%20Rosario" target="_blank">ASESORAMIENTO</a>
+      <a href="index.html#magazine">MAGAZINE</a>
+      <a href="index.html#tienda">TIENDA</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="auth.html" class="link-plain header-login" id="navLoginLink">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary btn-sm" id="navJoinBtn">UNITE A RPM</a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-drawer" id="mobileDrawer">
+    <a href="index.html#garage">GARAGE</a>
+    <a href="index.html#comunidad">COMUNIDAD</a>
+    <a href="index.html#eventos">EVENTOS</a>
+    <a href="https://wa.me/5493417046870?text=Hola,%20quiero%20asesoramiento%20sobre%20mi%20auto%20en%20RPM%20Rosario" target="_blank">ASESORAMIENTO</a>
+    <a href="index.html#magazine">MAGAZINE</a>
+    <a href="index.html#tienda">TIENDA</a>
+    <div class="mobile-drawer-actions">
+      <a href="auth.html" class="link-plain" id="navLoginLinkMobile">INICIAR SESIÓN</a>
+      <a href="auth.html" class="btn btn-primary" id="navJoinBtnMobile">UNITE A RPM</a>
+    </div>
+  </div>
+</header>
+
+<main class="cp-page">
+  <p class="cp-status" id="cpStatus" role="status">Cargando…</p>
+
+  <div id="cpApp" hidden>
+    <div class="cp-top">
+      <h1>MI CONCESIONARIA</h1>
+      <p id="cpSub"></p>
+    </div>
+
+    <!-- Estado de la verificación -->
+    <section class="cp-estado" id="cpEstado" hidden></section>
+
+    <!-- Cuenta de tipo particular -->
+    <section class="cp-card" id="cpParticular" hidden>
+      <h2>ESTA SECCIÓN ES PARA CONCESIONARIAS</h2>
+      <p class="cp-lead">Tu cuenta es de tipo particular. Si sos una concesionaria, creá una cuenta nueva eligiendo la opción <strong>Concesionaria</strong> al registrarte.</p>
+      <a href="index.html" class="btn btn-outline">VOLVER AL INICIO</a>
+    </section>
+
+    <!-- Activar: crea la solicitud -->
+    <section class="cp-card" id="cpActivar" hidden>
+      <h2>ACTIVÁ TU CONCESIONARIA</h2>
+      <p class="cp-lead">Confirmá los datos con los que vas a figurar. Después vas a poder completar tu ficha y verificarla subiendo la constancia de inscripción de ARCA.</p>
+      <form class="cp-form" id="activarForm" novalidate>
+        <label class="auth-field">
+          <span>Razón social</span>
+          <input type="text" name="razon_social" required maxlength="120" autocomplete="organization">
+        </label>
+        <label class="auth-field">
+          <span>CUIT</span>
+          <input type="text" name="cuit" id="activarCuit" required inputmode="numeric" maxlength="11" placeholder="11 números, sin guiones" autocomplete="off">
+        </label>
+        <p class="auth-message" id="activarMsg" hidden></p>
+        <div class="cp-actions"><button type="submit" class="btn btn-primary">ACTIVAR</button></div>
+      </form>
+    </section>
+
+    <!-- Panel principal -->
+    <div id="cpPanel" hidden>
+
+      <section class="cp-card" id="cpVerif">
+        <h2>VERIFICACIÓN</h2>
+        <div id="cpVerifBody"></div>
+      </section>
+
+      <section class="cp-card">
+        <h2>TU FICHA PÚBLICA</h2>
+        <p class="cp-lead">Es lo que ve la comunidad cuando entra a tu concesionaria. <span id="cpFichaLink"></span></p>
+
+        <form class="cp-form" id="fichaForm" novalidate>
+          <div class="cp-row cp-readonly">
+            <label class="auth-field"><span>Razón social</span><input type="text" id="roRazon" disabled></label>
+            <label class="auth-field"><span>CUIT</span><input type="text" id="roCuit" disabled></label>
+          </div>
+          <p class="cp-hint">La razón social y el CUIT no se editan acá. Si hay un error, escribinos y lo corregimos.</p>
+
+          <label class="auth-field">
+            <span>Nombre comercial (opcional)</span>
+            <input type="text" name="nombre_comercial" maxlength="80" placeholder="Cómo te conoce la gente">
+          </label>
+
+          <label class="auth-field">
+            <span>Descripción</span>
+            <textarea name="descripcion" rows="4" maxlength="600" placeholder="Qué venden, hace cuánto, qué los diferencia…"></textarea>
+          </label>
+
+          <div class="cp-row">
+            <label class="auth-field"><span>Dirección</span><input type="text" name="direccion" maxlength="160" placeholder="Bv. Oroño 1234, Rosario"></label>
+            <label class="auth-field"><span>Horarios</span><input type="text" name="horarios" maxlength="120" placeholder="Lun a Vie 9 a 19 hs"></label>
+          </div>
+
+          <div class="cp-row">
+            <label class="auth-field"><span>Teléfono</span><input type="tel" name="telefono" inputmode="numeric" placeholder="3415551234"></label>
+            <label class="auth-field"><span>WhatsApp</span><input type="tel" name="whatsapp" inputmode="numeric" placeholder="5493415551234"></label>
+          </div>
+          <p class="cp-hint">WhatsApp con código de país, sin + ni espacios (Argentina: 549 + código de área + número).</p>
+
+          <div class="cp-media">
+            <div class="cp-logo-preview" id="logoPreview">Sin logo</div>
+            <label class="auth-field" style="flex:1">
+              <span>Logo</span>
+              <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
+              <small class="cp-hint">Se sube y se achica automáticamente.</small>
+            </label>
+          </div>
+
+          <div id="planSocial">
+            <p class="cp-hint" id="planSocialHint"></p>
+            <div class="cp-row" style="margin-top:12px">
+              <label class="auth-field"><span>Instagram</span><input type="text" name="instagram" placeholder="@tuconcesionaria"></label>
+              <label class="auth-field"><span>Facebook</span><input type="text" name="facebook" placeholder="tuconcesionaria"></label>
+            </div>
+            <label class="auth-field" style="margin-top:16px"><span>Sitio web</span><input type="text" name="web" placeholder="https://www.tusitio.com"></label>
+            <div class="cp-media" style="margin-top:16px">
+              <div class="cp-logo-preview" id="portadaPreview" style="width:140px">Sin portada</div>
+              <label class="auth-field" style="flex:1">
+                <span>Imagen de portada</span>
+                <input type="file" id="portadaFile" accept="image/png,image/jpeg,image/webp">
+              </label>
+            </div>
+          </div>
+
+          <p class="auth-message" id="fichaMsg" hidden></p>
+          <div class="cp-actions"><button type="submit" class="btn btn-primary">GUARDAR FICHA</button></div>
+        </form>
+      </section>
+
+      <section class="cp-card" id="cpPlanCard">
+        <h2>TU PLAN</h2>
+        <div class="cp-plan" id="cpPlanBody"></div>
+        <p class="cp-hint" style="margin-top:12px">Para cambiar de plan escribinos a <a href="mailto:Rpm.rosario.km@gmail.com" style="color:var(--accent-bright)">Rpm.rosario.km@gmail.com</a>.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/site-nav.js"></script>
+<script src="js/mi-concesionaria.js"></script>
+</body>
+</html>

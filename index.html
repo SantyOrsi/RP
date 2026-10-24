@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/chat.css">
 <link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/tienda.css">
 </head>
 <body>
 
@@ -229,6 +230,102 @@
   </div>
 </section>
 
+<!-- ===== TIENDA / SUSCRIPCIONES (próximamente) ===== -->
+<section class="tienda" id="tienda" aria-labelledby="tiendaTitle">
+  <div class="tienda-speed" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="tienda-inner">
+    <p class="section-eyebrow section-eyebrow--tight tienda-eyebrow">TIENDA · SUSCRIPCIONES</p>
+
+    <!-- Tacómetro (se dibuja y anima desde js/tienda.js) -->
+    <div class="tienda-gauge" aria-hidden="true">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" id="tachoSvg">
+        <defs>
+          <linearGradient id="tBezel" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4a5563"/>
+            <stop offset=".45" stop-color="#10141a"/>
+            <stop offset=".7" stop-color="#0b0d11"/>
+            <stop offset="1" stop-color="#3b4452"/>
+          </linearGradient>
+          <radialGradient id="tFace" cx=".5" cy=".42" r=".65">
+            <stop offset="0" stop-color="#171d25"/>
+            <stop offset=".7" stop-color="#0a0d11"/>
+            <stop offset="1" stop-color="#050709"/>
+          </radialGradient>
+          <linearGradient id="tGlass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity=".16"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="tGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1.6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <circle cx="100" cy="100" r="98" fill="url(#tBezel)"/>
+        <circle cx="100" cy="100" r="92.5" fill="#030405"/>
+        <circle cx="100" cy="100" r="90" fill="url(#tFace)"/>
+
+        <!-- Zona roja (6.5 a 8 x1000) -->
+        <path id="tachoRed" d="M184.59 91.67 A85 85 0 0 1 160.10 160.10" fill="none" stroke="#ff3b30" stroke-width="3.5" stroke-linecap="butt" opacity=".95"/>
+
+        <g id="tachoTicks"><line x1="42.02" y1="157.98" x2="49.09" y2="150.91" class="tacho-tick tacho-tick--major"/><line x1="34.14" y1="148.85" x2="37.75" y2="146.17" class="tacho-tick tacho-tick--minor"/><line x1="27.68" y1="138.65" x2="31.65" y2="136.53" class="tacho-tick tacho-tick--minor"/><line x1="22.79" y1="127.62" x2="27.03" y2="126.11" class="tacho-tick tacho-tick--minor"/><line x1="19.58" y1="116.00" x2="29.38" y2="114.05" class="tacho-tick tacho-tick--major"/><line x1="18.10" y1="104.02" x2="22.59" y2="103.80" class="tacho-tick tacho-tick--minor"/><line x1="18.39" y1="91.96" x2="22.87" y2="92.40" class="tacho-tick tacho-tick--minor"/><line x1="20.46" y1="80.08" x2="24.82" y2="81.17" class="tacho-tick tacho-tick--minor"/><line x1="24.24" y1="68.62" x2="33.48" y2="72.45" class="tacho-tick tacho-tick--major"/><line x1="29.67" y1="57.84" x2="33.53" y2="60.16" class="tacho-tick tacho-tick--minor"/><line x1="36.61" y1="47.98" x2="40.09" y2="50.83" class="tacho-tick tacho-tick--minor"/><line x1="44.93" y1="39.24" x2="47.95" y2="42.58" class="tacho-tick tacho-tick--minor"/><line x1="54.44" y1="31.82" x2="60.00" y2="40.13" class="tacho-tick tacho-tick--major"/><line x1="64.94" y1="25.87" x2="66.86" y2="29.94" class="tacho-tick tacho-tick--minor"/><line x1="76.20" y1="21.53" x2="77.50" y2="25.84" class="tacho-tick tacho-tick--minor"/><line x1="87.97" y1="18.89" x2="88.63" y2="23.34" class="tacho-tick tacho-tick--minor"/><line x1="100.00" y1="18.00" x2="100.00" y2="28.00" class="tacho-tick tacho-tick--major"/><line x1="112.03" y1="18.89" x2="111.37" y2="23.34" class="tacho-tick tacho-tick--minor"/><line x1="123.80" y1="21.53" x2="122.50" y2="25.84" class="tacho-tick tacho-tick--minor"/><line x1="135.06" y1="25.87" x2="133.14" y2="29.94" class="tacho-tick tacho-tick--minor"/><line x1="145.56" y1="31.82" x2="140.00" y2="40.13" class="tacho-tick tacho-tick--major"/><line x1="155.07" y1="39.24" x2="152.05" y2="42.58" class="tacho-tick tacho-tick--minor"/><line x1="163.39" y1="47.98" x2="159.91" y2="50.83" class="tacho-tick tacho-tick--minor"/><line x1="170.33" y1="57.84" x2="166.47" y2="60.16" class="tacho-tick tacho-tick--minor"/><line x1="175.76" y1="68.62" x2="166.52" y2="72.45" class="tacho-tick tacho-tick--major"/><line x1="179.54" y1="80.08" x2="175.18" y2="81.17" class="tacho-tick tacho-tick--minor"/><line x1="181.61" y1="91.96" x2="177.13" y2="92.40" class="tacho-tick tacho-tick--minor tacho-tick--red"/><line x1="181.90" y1="104.02" x2="177.41" y2="103.80" class="tacho-tick tacho-tick--minor tacho-tick--red"/><line x1="180.42" y1="116.00" x2="170.62" y2="114.05" class="tacho-tick tacho-tick--major tacho-tick--red"/><line x1="177.21" y1="127.62" x2="172.97" y2="126.11" class="tacho-tick tacho-tick--minor tacho-tick--red"/><line x1="172.32" y1="138.65" x2="168.35" y2="136.53" class="tacho-tick tacho-tick--minor tacho-tick--red"/><line x1="165.86" y1="148.85" x2="162.25" y2="146.17" class="tacho-tick tacho-tick--minor tacho-tick--red"/><line x1="157.98" y1="157.98" x2="150.91" y2="150.91" class="tacho-tick tacho-tick--major tacho-tick--red"/></g>
+        <g id="tachoNums"><text x="57.57" y="142.43" class="tacho-num">0</text><text x="41.15" y="111.71" class="tacho-num">1</text><text x="44.57" y="77.04" class="tacho-num">2</text><text x="66.67" y="50.11" class="tacho-num">3</text><text x="100.00" y="40.00" class="tacho-num">4</text><text x="133.33" y="50.11" class="tacho-num">5</text><text x="155.43" y="77.04" class="tacho-num">6</text><text x="158.85" y="111.71" class="tacho-num tacho-num--red">7</text><text x="142.43" y="142.43" class="tacho-num tacho-num--red">8</text></g>
+
+        <text x="100" y="128" text-anchor="middle" class="tacho-unit">x1000 r/min</text>
+
+        <!-- Lectura digital -->
+        <rect x="76" y="140" width="48" height="19" rx="3" class="tacho-lcd"/>
+        <text x="100" y="153.5" text-anchor="middle" class="tacho-readout" id="tachoReadout">0</text>
+
+        <!-- Aguja (afilada, con contrapeso) -->
+        <g id="tachoNeedle" transform="rotate(-135 100 100)" filter="url(#tGlow)">
+          <path d="M98.4 118 L101.6 118 L100.6 22 L99.4 22 Z" class="tacho-needle"/>
+        </g>
+        <circle cx="100" cy="100" r="9" fill="#1b212a" stroke="#4a5563" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="3.2" fill="#0b0d11"/>
+
+        <!-- Reflejo del vidrio -->
+        <path d="M18 92 A82 82 0 0 1 182 92 Q100 68 18 92 Z" fill="url(#tGlass)"/>
+      </svg>
+    </div>
+
+    <h2 class="tienda-title" id="tiendaTitle" aria-label="Próximamente">
+      <span class="tienda-letters" aria-hidden="true">
+        <span style="--i:0">P</span><span style="--i:1">R</span><span style="--i:2">Ó</span><span style="--i:3">X</span><span style="--i:4">I</span><span style="--i:5">M</span><span style="--i:6">A</span><span style="--i:7">M</span><span style="--i:8">E</span><span style="--i:9">N</span><span style="--i:10">T</span><span style="--i:11">E</span>
+      </span>
+    </h2>
+
+    <p class="tienda-text">Estamos calentando motores. Muy pronto vas a poder suscribirte a RPM con planes pensados para particulares y para concesionarias.</p>
+
+    <div class="tienda-plans">
+      <article class="tienda-plan" style="--d:0">
+        <span class="tienda-plan-badge"><i aria-hidden="true"></i>PRÓXIMAMENTE</span>
+        <div class="tienda-plan-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        </div>
+        <h3>PARTICULAR</h3>
+        <p>Para quienes quieren sacarle más jugo a la comunidad con su propia cuenta.</p>
+      </article>
+
+      <article class="tienda-plan" style="--d:1">
+        <span class="tienda-plan-badge"><i aria-hidden="true"></i>PRÓXIMAMENTE</span>
+        <div class="tienda-plan-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/></svg>
+        </div>
+        <h3>CONCESIONARIA</h3>
+        <p>Para concesionarias que quieren mostrar su stock a toda la comunidad.</p>
+      </article>
+    </div>
+
+    <div class="tienda-loader" aria-hidden="true"><span></span></div>
+
+    <a href="auth.html" class="btn btn-primary tienda-cta">UNITE A RPM Y ENTERATE PRIMERO <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
 <!-- ===== NEWSLETTER ===== -->
 <section class="newsletter">
   <div class="newsletter-inner" data-reveal="zoom">
@@ -284,7 +381,7 @@
       <a href="#">Contacto</a>
     </div>
 
-    <div class="footer-col" id="tienda">
+    <div class="footer-col">
       <h4>CONTACTO</h4>
       <a href="mailto:hola@rpmrosario.com"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>hola@rpmrosario.com</a>
       <a href="#"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M12 21s-7-6.3-7-11a7 7 0 0114 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Rosario, Santa Fe, Argentina</a>

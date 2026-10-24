@@ -42,8 +42,9 @@ tabs.forEach(tab => {
 // ----- Selector de tipo de cuenta (particular / concesionaria) -----
 const accountTypeBtns = document.querySelectorAll('.account-type-btn');
 const accountTypeInput = document.querySelector('#registerForm input[name="account_type"]');
-const fieldRazonSocial = document.getElementById('fieldRazonSocial');
-const razonSocialInput = fieldRazonSocial.querySelector('input[name="razon_social"]');
+const fieldDatosConcesionaria = document.getElementById('fieldDatosConcesionaria');
+const razonSocialInput = fieldDatosConcesionaria.querySelector('input[name="razon_social"]');
+const cuitEmpresaInput = document.getElementById('cuitEmpresaInput');
 const fieldDatosPersonales = document.getElementById('fieldDatosPersonales');
 const nombreInput = fieldDatosPersonales.querySelector('input[name="nombre"]');
 const apellidoInput = fieldDatosPersonales.querySelector('input[name="apellido"]');
@@ -54,9 +55,10 @@ function actualizarCamposPorTipoDeCuenta(tipo) {
   const esConcesionaria = tipo === 'concesionaria';
 
   if (esConcesionaria) {
-    // Si es CONCESIONARIA: muestra Razón Social y oculta Datos Personales
-    fieldRazonSocial.removeAttribute('hidden');
+    // Si es CONCESIONARIA: muestra Razón Social + CUIT y oculta Datos Personales
+    fieldDatosConcesionaria.removeAttribute('hidden');
     razonSocialInput.required = true;
+    cuitEmpresaInput.required = true;
 
     fieldDatosPersonales.setAttribute('hidden', '');
     nombreInput.required = false;
@@ -67,10 +69,12 @@ function actualizarCamposPorTipoDeCuenta(tipo) {
     apellidoInput.value = '';
     documentoInput.value = '';
   } else {
-    // Si es PARTICULAR: oculta Razón Social y muestra Datos Personales (Nombre, Apellido, DNI/CUIT)
-    fieldRazonSocial.setAttribute('hidden', '');
+    // Si es PARTICULAR: oculta Razón Social + CUIT y muestra Datos Personales (Nombre, Apellido, DNI/CUIT)
+    fieldDatosConcesionaria.setAttribute('hidden', '');
     razonSocialInput.required = false;
     razonSocialInput.value = '';
+    cuitEmpresaInput.required = false;
+    cuitEmpresaInput.value = '';
 
     fieldDatosPersonales.removeAttribute('hidden');
     nombreInput.required = true;
@@ -127,6 +131,7 @@ function agregarValidadoresNumero(input) {
 
 // Agregar validadores al DNI
 agregarValidadoresNumero(documentoInput);
+agregarValidadoresNumero(cuitEmpresaInput);
 
 // Agregar validadores a los campos numéricos del teléfono
 const prefijoInput = document.getElementById('prefijoInput');
@@ -316,6 +321,7 @@ registerForm.addEventListener('submit', async (e) => {
       password: 'La contraseña debe tener al menos 8 caracteres.',
       password_confirm: 'Confirmá tu contraseña.',
       documento: 'Completá un DNI o CUIT válido.',
+      cuit_empresa: 'El CUIT debe tener 11 números, sin guiones.',
       prefijo: 'El prefijo debe tener entre 2 y 5 números.',
       telefono_movil: 'El teléfono móvil debe tener entre 6 y 10 números.'
     };
@@ -333,6 +339,7 @@ registerForm.addEventListener('submit', async (e) => {
   const passwordConfirm = formData.get('password_confirm');
   const accountType = formData.get('account_type');
   const razonSocial = (formData.get('razon_social') || '').trim();
+  const cuitEmpresa = (formData.get('cuit_empresa') || '').trim();
   const nombre = (formData.get('nombre') || '').trim();
   const apellido = (formData.get('apellido') || '').trim();
   const documentoTipo = formData.get('documento_tipo') || 'dni';
@@ -382,6 +389,10 @@ registerForm.addEventListener('submit', async (e) => {
       mostrarMensaje(registerMessage, 'Ingresá la razón social de la concesionaria (mínimo 3 caracteres).');
       return;
     }
+    if (!validarCuit(cuitEmpresa)) {
+      mostrarMensaje(registerMessage, cuitEmpresa.replace(/\D/g, '').length !== 11 ? 'El CUIT tiene que tener 11 números.' : 'El CUIT de la concesionaria no es válido: el último dígito no coincide. Revisá que lo hayas copiado bien de tu constancia de ARCA.');
+      return;
+    }
   } else {
     if (nombre.length < 2 || apellido.length < 2) {
       mostrarMensaje(registerMessage, 'Ingresá tu nombre y apellido.');
@@ -418,8 +429,8 @@ registerForm.addEventListener('submit', async (e) => {
           razon_social: accountType === 'concesionaria' ? razonSocial : null,
           nombre: accountType === 'particular' ? nombre : null,
           apellido: accountType === 'particular' ? apellido : null,
-          documento_tipo: accountType === 'particular' ? documentoTipo : null,
-          documento: accountType === 'particular' ? documento.replace(/\D/g, '') : null,
+          documento_tipo: accountType === 'particular' ? documentoTipo : 'cuit',
+          documento: accountType === 'particular' ? documento.replace(/\D/g, '') : cuitEmpresa.replace(/\D/g, ''),
           provincia,
           ciudad: ciudad || null,
           prefijo: prefijo.replace(/\D/g, ''),

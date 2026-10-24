@@ -132,12 +132,18 @@
       <label for="garageDescripcionInput">Descripción:</label>
       <textarea id="garageDescripcionInput" placeholder="Contá algo sobre tu auto o proyecto..." rows="4" maxlength="500"></textarea>
 
-      <label for="garageImagenInput">Fotos (hasta 5):</label>
-      <input type="file" id="garageImagenInput" accept="image/*" multiple>
+      <span class="garage-fotos-titulo">Fotos (hasta 5):</span>
+      <div class="garage-foto-acciones">
+        <label class="btn btn-outline btn-sm garage-foto-btn" for="garageImagenInput">ELEGIR DE LA GALERÍA</label>
+        <label class="btn btn-outline btn-sm garage-foto-btn" for="garageCamaraInput">SACAR FOTO</label>
+      </div>
+      <input type="file" id="garageImagenInput" class="garage-file-oculto" accept="image/*" multiple>
+      <input type="file" id="garageCamaraInput" class="garage-file-oculto" accept="image/*" capture="environment">
       <div id="garageFotosPreview" class="garage-fotos-preview"></div>
+      <p id="garageFotosEstado" class="garage-fotos-estado" role="status" aria-live="polite" hidden></p>
 
       <button type="submit" id="garageFormSubmit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">PUBLICAR</button>
-      <p id="garageFormMessage" class="auth-message" hidden></p>
+      <p id="garageFormMessage" class="auth-message" role="status" aria-live="polite" hidden></p>
     </form>
   </div>
 </div>

@@ -84,10 +84,17 @@
         <input type="hidden" name="account_type" value="particular">
 
         <!-- Solo para Concesionaria -->
-        <label class="auth-field" id="fieldRazonSocial" hidden>
-          <span>Razón social</span>
-          <input type="text" name="razon_social" autocomplete="organization" placeholder="Ej: Automotores del Litoral S.A.">
-        </label>
+        <div id="fieldDatosConcesionaria" hidden>
+          <label class="auth-field" id="fieldRazonSocial">
+            <span>Razón social</span>
+            <input type="text" name="razon_social" autocomplete="organization" placeholder="Ej: Automotores del Litoral S.A.">
+          </label>
+          <label class="auth-field">
+            <span>CUIT de la concesionaria</span>
+            <input type="text" name="cuit_empresa" id="cuitEmpresaInput" inputmode="numeric" autocomplete="off" placeholder="11 números, sin guiones" maxlength="11" pattern="[0-9]*">
+          </label>
+          <small class="auth-help">Después vas a poder verificar tu concesionaria subiendo la constancia de inscripción de ARCA. Hasta entonces tu cuenta funciona como una cuenta particular.</small>
+        </div>
 
         <!-- Solo para Particular -->
         <div id="fieldDatosPersonales">
